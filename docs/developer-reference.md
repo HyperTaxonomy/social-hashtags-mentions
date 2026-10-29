@@ -44,7 +44,7 @@ A mention created by picking a **local user** from the `@` autocomplete (rather 
 - Otherwise, an unlinked term that happens to share the user's display name is claimed for them; a term already linked to a *different* user is left alone and a distinctly-named term is created instead (WordPress itself disallows two terms with the same name in a flat taxonomy), so two different people with the same display name are never silently merged.
 - Claiming or creating a term this way also sets its TermConnect "Local site" link to that user's profile automatically (via `tc_set_term_link()`), unless one is already set.
 
-A mention picked from the existing-terms list, or typed as free text with no matching local user, behaves exactly as before (resolved/created by name only).
+A mention picked from the existing-terms list, or typed as free text with no matching local user, is resolved/created by name only.
 
 ## Filters
 
