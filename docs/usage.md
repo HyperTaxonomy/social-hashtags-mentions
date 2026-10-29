@@ -24,7 +24,7 @@ Two display options live on the same screen:
 In any rich-text field in the block editor, type `#` or `@`. An autocomplete list appears:
 
 - `#` — searches existing **hashtag** terms; choose one, or pick "Create #…" to make a new one.
-- `@` — searches existing **mention** terms and your **local users** in one combined list.
+- `@` — searches existing **mention** terms and your **local users** in one combined list. Picking a local user ties the mention to that person's account (not just their display name), and automatically sets the term's "Local site" profile link the first time — so two different users who happen to share a display name are never merged into the same mention.
 
 Selecting an item inserts a styled token. Terms are created and assigned to the post **automatically when you save** — there is no separate taxonomy box.
 

@@ -23,6 +23,32 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 add_action( 'save_post', 'sh_sync_post_terms', 20, 2 );
+add_filter( 'wp_kses_allowed_html', 'sh_kses_allowed_html', 10, 2 );
+
+/**
+ * Whitelists this plugin's data-sh-* token attributes on <a> tags for the
+ * 'post' kses context.
+ *
+ * Without this, wp_insert_post()/wp_update_post() strips every data-sh-*
+ * attribute from post_content for any user without the unfiltered_html
+ * capability — every role except Administrator on a single-site install, and
+ * effectively everyone on multisite — which silently breaks the entire
+ * token-to-taxonomy pipeline for most real installs.
+ *
+ * @since 1.0.1
+ * @param array        $tags    Allowed tags/attributes.
+ * @param string|array $context Kses context name, or an allowed-tags array.
+ * @return array
+ */
+function sh_kses_allowed_html( $tags, $context ) {
+    if ( 'post' !== $context || ! is_array( $tags ) || ! isset( $tags['a'] ) || ! is_array( $tags['a'] ) ) {
+        return $tags;
+    }
+    foreach ( array( 'data-sh-tax', 'data-sh-term', 'data-sh-name', 'data-sh-networks', 'data-sh-user-id' ) as $attr ) {
+        $tags['a'][ $attr ] = true;
+    }
+    return $tags;
+}
 
 /**
  * Reconciles a post's hashtag/mention terms with the tokens in its content.
@@ -59,7 +85,7 @@ function sh_sync_post_terms( int $post_id, $post ): void {
                 }
             }
             if ( '' !== $token['name'] ) {
-                $created = sh_get_or_create_term( $token['name'], $taxonomy );
+                $created = sh_get_or_create_term( $token['name'], $taxonomy, $token['user_id'] );
                 if ( $created > 0 ) {
                     $ids[] = $created;
                 }
@@ -83,7 +109,9 @@ function sh_extract_tokens( string $content ): array {
         return $tokens;
     }
 
-    if ( ! preg_match_all( '/<a\b([^>]*)>(.*?)<\/a>/is', $content, $matches, PREG_SET_ORDER ) ) {
+    // Attribute portion is quote-aware so a literal '>' inside a quoted attribute
+    // value (e.g. title="a > b") doesn't truncate the match early.
+    if ( ! preg_match_all( '/<a\b((?:[^>"\']|"[^"]*"|\'[^\']*\')*)>(.*?)<\/a>/is', $content, $matches, PREG_SET_ORDER ) ) {
         return $tokens;
     }
 
@@ -100,10 +128,11 @@ function sh_extract_tokens( string $content ): array {
             $name = ltrim( $text, '#@' );
         }
         $tokens[] = array(
-            'tax'  => $tax,
-            'id'   => (int) sh_token_attr( $attrs, 'data-sh-term' ),
-            'name' => $name,
-            'text' => $text,
+            'tax'     => $tax,
+            'id'      => (int) sh_token_attr( $attrs, 'data-sh-term' ),
+            'name'    => $name,
+            'text'    => $text,
+            'user_id' => (int) sh_token_attr( $attrs, 'data-sh-user-id' ),
         );
     }
 
@@ -129,27 +158,139 @@ function sh_token_attr( string $attrs, string $name ): string {
 /**
  * Returns an existing term ID by name, creating the term if necessary.
  *
+ * When $user_id is given (a mention picked from the @ autocomplete's local-user
+ * results), the term is resolved/claimed by that user's identity first — via the
+ * `_sh_user_id` term meta set by sh_link_term_to_user() — rather than by name text
+ * alone, so two different users who happen to share a display name are never
+ * silently merged into one mention term.
+ *
  * @since 1.0.0
  * @param string $name     Term name/label.
  * @param string $taxonomy Taxonomy slug.
+ * @param int    $user_id  Optional WordPress user ID this mention resolved to.
  * @return int Term ID, or 0 on failure.
  */
-function sh_get_or_create_term( string $name, string $taxonomy ): int {
+function sh_get_or_create_term( string $name, string $taxonomy, int $user_id = 0 ): int {
     $name = trim( $name );
     if ( '' === $name ) {
         return 0;
     }
 
+    if ( $user_id > 0 && 'mention' === $taxonomy ) {
+        $linked_term_id = sh_find_term_by_user_id( $user_id );
+        if ( $linked_term_id > 0 ) {
+            return $linked_term_id;
+        }
+    }
+
     $existing = term_exists( $name, $taxonomy );
     if ( $existing ) {
-        return (int) ( is_array( $existing ) ? $existing['term_id'] : $existing );
+        $term_id = (int) ( is_array( $existing ) ? $existing['term_id'] : $existing );
+
+        if ( 0 === $user_id || 'mention' !== $taxonomy ) {
+            return $term_id;
+        }
+
+        $linked_user = (int) get_term_meta( $term_id, '_sh_user_id', true );
+        if ( 0 === $linked_user ) {
+            // An untagged term that happens to share this user's display name —
+            // claim it for them.
+            sh_link_term_to_user( $term_id, $user_id );
+            return $term_id;
+        }
+        if ( $linked_user === $user_id ) {
+            return $term_id;
+        }
+
+        // The name collides with a different user's already-linked term. WordPress
+        // itself forbids two terms with the same name in a flat taxonomy, so create
+        // a distinctly-named term instead of silently reassigning their link.
+        $name = sh_disambiguate_term_name( $name, $user_id );
+        $existing = term_exists( $name, $taxonomy );
+        if ( $existing ) {
+            $term_id = (int) ( is_array( $existing ) ? $existing['term_id'] : $existing );
+            sh_link_term_to_user( $term_id, $user_id );
+            return $term_id;
+        }
     }
 
     $result = wp_insert_term( $name, $taxonomy );
     if ( is_wp_error( $result ) ) {
         // A race or slug collision may have created it; try once more.
         $existing = term_exists( $name, $taxonomy );
-        return $existing ? (int) ( is_array( $existing ) ? $existing['term_id'] : $existing ) : 0;
+        $term_id  = $existing ? (int) ( is_array( $existing ) ? $existing['term_id'] : $existing ) : 0;
+    } else {
+        $term_id = (int) $result['term_id'];
     }
-    return (int) $result['term_id'];
+
+    if ( $term_id > 0 && $user_id > 0 && 'mention' === $taxonomy ) {
+        sh_link_term_to_user( $term_id, $user_id );
+    }
+
+    return $term_id;
+}
+
+/**
+ * Finds the mention term already linked to a given local user, by stored meta.
+ *
+ * @since 1.0.1
+ * @param int $user_id WordPress user ID.
+ * @return int Term ID, or 0 if none.
+ */
+function sh_find_term_by_user_id( int $user_id ): int {
+    $terms = get_terms( array(
+        'taxonomy'   => 'mention',
+        'hide_empty' => false,
+        'number'     => 1,
+        'fields'     => 'ids',
+        'meta_query' => array(
+            array(
+                'key'   => '_sh_user_id',
+                'value' => $user_id,
+            ),
+        ),
+    ) );
+    return ( is_array( $terms ) && ! empty( $terms ) ) ? (int) $terms[0] : 0;
+}
+
+/**
+ * Builds a disambiguated term name for a mention that collides, by display name,
+ * with a different local user's already-linked term.
+ *
+ * @since 1.0.1
+ * @param string $name    Original (colliding) display name.
+ * @param int    $user_id WordPress user ID the new term is for.
+ * @return string
+ */
+function sh_disambiguate_term_name( string $name, int $user_id ): string {
+    $user = get_user_by( 'id', $user_id );
+    $tag  = $user ? $user->user_nicename : (string) $user_id;
+    return $name . ' (' . $tag . ')';
+}
+
+/**
+ * Records a mention term's linked local user and, when no "Local site" profile
+ * link is already set, wires one up from that user's profile — so a mention
+ * created from the @ autocomplete's local-user results is unambiguously tied to
+ * that person rather than resolved by display-name text alone.
+ *
+ * @since 1.0.1
+ * @param int $term_id Term ID.
+ * @param int $user_id WordPress user ID.
+ */
+function sh_link_term_to_user( int $term_id, int $user_id ): void {
+    update_term_meta( $term_id, '_sh_user_id', $user_id );
+
+    if ( ! function_exists( 'tc_set_term_link' ) ) {
+        return;
+    }
+    $user = get_user_by( 'id', $user_id );
+    if ( ! $user ) {
+        return;
+    }
+    $existing = function_exists( 'tc_get_term_links' ) ? tc_get_term_links( $term_id ) : array();
+    if ( '' !== (string) ( $existing['local_site'] ?? '' ) ) {
+        return; // Already linked (e.g. set manually on the term edit screen) — don't override.
+    }
+    tc_set_term_link( $term_id, 'local_site', $user->user_nicename, $user->display_name );
 }

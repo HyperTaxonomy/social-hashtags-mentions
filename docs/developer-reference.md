@@ -30,8 +30,21 @@ The editor inserts each token as an anchor the server understands:
 | `data-sh-term` | term ID, or empty for a not-yet-created term |
 | `data-sh-name` | label for a not-yet-created term (used to get-or-create on save) |
 | `data-sh-networks` | `*` (all enabled) or a comma-separated subset |
+| `data-sh-user-id` | mention only: the WordPress user ID, when the token was created by picking a local user from the `@` autocomplete (empty otherwise) |
 
 On `save_post`, the plugin reconciles each post's `hashtag`/`mention` terms to exactly the tokens present (creating terms by name when needed). On `the_content`, it rewrites tokens into the final links and selection panes.
+
+The plugin registers a `wp_kses_allowed_html` filter (`sh_kses_allowed_html()` in `includes/term-sync.php`) to whitelist the `data-sh-*` attributes on `<a>` tags for the `'post'` kses context. Without it, `wp_insert_post()`/`wp_update_post()` strips these attributes from `post_content` for any user without the `unfiltered_html` capability — i.e. every role except Administrator on a single-site install, and effectively everyone on multisite.
+
+### Mention identity
+
+A mention created by picking a **local user** from the `@` autocomplete (rather than an existing term or free text) carries that user's ID in `data-sh-user-id`. On save, `sh_get_or_create_term()` resolves/creates the term by that identity:
+
+- If a mention term already linked to that user exists (tracked via the `_sh_user_id` term meta), it's reused.
+- Otherwise, an unlinked term that happens to share the user's display name is claimed for them; a term already linked to a *different* user is left alone and a distinctly-named term is created instead (WordPress itself disallows two terms with the same name in a flat taxonomy), so two different people with the same display name are never silently merged.
+- Claiming or creating a term this way also sets its TermConnect "Local site" link to that user's profile automatically (via `tc_set_term_link()`), unless one is already set.
+
+A mention picked from the existing-terms list, or typed as free text with no matching local user, behaves exactly as before (resolved/created by name only).
 
 ## Filters
 
