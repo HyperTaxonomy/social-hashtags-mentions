@@ -72,7 +72,7 @@ function sh_register_rest_routes(): void {
  * to edit the specific mention term, so a Contributor/Author can't enumerate
  * another term's configured network handles just by guessing term IDs.
  *
- * @since 1.0.1
+ * @since 1.0.0
  * @param WP_REST_Request $request Request.
  * @return bool
  */

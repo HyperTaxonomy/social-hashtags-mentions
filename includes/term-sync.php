@@ -35,7 +35,7 @@ add_filter( 'wp_kses_allowed_html', 'sh_kses_allowed_html', 10, 2 );
  * effectively everyone on multisite — which silently breaks the entire
  * token-to-taxonomy pipeline for most real installs.
  *
- * @since 1.0.1
+ * @since 1.0.0
  * @param array        $tags    Allowed tags/attributes.
  * @param string|array $context Kses context name, or an allowed-tags array.
  * @return array
@@ -160,7 +160,7 @@ function sh_token_attr( string $attrs, string $name ): string {
  *
  * When $user_id is given (a mention picked from the @ autocomplete's local-user
  * results), the term is resolved/claimed by that user's identity first — via the
- * `_sh_user_id` term meta set by sh_link_term_to_user() — rather than by name text
+ * `_sh_user_id` term meta set by sh_set_term_user_link() — rather than by name text
  * alone, so two different users who happen to share a display name are never
  * silently merged into one mention term.
  *
@@ -177,7 +177,7 @@ function sh_get_or_create_term( string $name, string $taxonomy, int $user_id = 0
     }
 
     if ( $user_id > 0 && 'mention' === $taxonomy ) {
-        $linked_term_id = sh_find_term_by_user_id( $user_id );
+        $linked_term_id = sh_get_term_by_user_id( $user_id );
         if ( $linked_term_id > 0 ) {
             return $linked_term_id;
         }
@@ -195,7 +195,7 @@ function sh_get_or_create_term( string $name, string $taxonomy, int $user_id = 0
         if ( 0 === $linked_user ) {
             // An untagged term that happens to share this user's display name —
             // claim it for them.
-            sh_link_term_to_user( $term_id, $user_id );
+            sh_set_term_user_link( $term_id, $user_id );
             return $term_id;
         }
         if ( $linked_user === $user_id ) {
@@ -209,7 +209,7 @@ function sh_get_or_create_term( string $name, string $taxonomy, int $user_id = 0
         $existing = term_exists( $name, $taxonomy );
         if ( $existing ) {
             $term_id = (int) ( is_array( $existing ) ? $existing['term_id'] : $existing );
-            sh_link_term_to_user( $term_id, $user_id );
+            sh_set_term_user_link( $term_id, $user_id );
             return $term_id;
         }
     }
@@ -224,7 +224,7 @@ function sh_get_or_create_term( string $name, string $taxonomy, int $user_id = 0
     }
 
     if ( $term_id > 0 && $user_id > 0 && 'mention' === $taxonomy ) {
-        sh_link_term_to_user( $term_id, $user_id );
+        sh_set_term_user_link( $term_id, $user_id );
     }
 
     return $term_id;
@@ -233,11 +233,11 @@ function sh_get_or_create_term( string $name, string $taxonomy, int $user_id = 0
 /**
  * Finds the mention term already linked to a given local user, by stored meta.
  *
- * @since 1.0.1
+ * @since 1.0.0
  * @param int $user_id WordPress user ID.
  * @return int Term ID, or 0 if none.
  */
-function sh_find_term_by_user_id( int $user_id ): int {
+function sh_get_term_by_user_id( int $user_id ): int {
     $terms = get_terms( array(
         'taxonomy'   => 'mention',
         'hide_empty' => false,
@@ -257,7 +257,7 @@ function sh_find_term_by_user_id( int $user_id ): int {
  * Builds a disambiguated term name for a mention that collides, by display name,
  * with a different local user's already-linked term.
  *
- * @since 1.0.1
+ * @since 1.0.0
  * @param string $name    Original (colliding) display name.
  * @param int    $user_id WordPress user ID the new term is for.
  * @return string
@@ -274,11 +274,11 @@ function sh_disambiguate_term_name( string $name, int $user_id ): string {
  * created from the @ autocomplete's local-user results is unambiguously tied to
  * that person rather than resolved by display-name text alone.
  *
- * @since 1.0.1
+ * @since 1.0.0
  * @param int $term_id Term ID.
  * @param int $user_id WordPress user ID.
  */
-function sh_link_term_to_user( int $term_id, int $user_id ): void {
+function sh_set_term_user_link( int $term_id, int $user_id ): void {
     update_term_meta( $term_id, '_sh_user_id', $user_id );
 
     if ( ! function_exists( 'tc_set_term_link' ) ) {
