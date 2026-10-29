@@ -1,0 +1,234 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the social-hashtags-mentions package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: social-hashtags-mentions 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-29 13:55-0400\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: includes/admin.php:31
+msgid "Settings"
+msgstr ""
+
+#: includes/admin.php:43 includes/admin.php:44 includes/admin.php:131
+msgid "Social Hashtags & Mentions"
+msgstr ""
+
+#: includes/admin.php:89 includes/admin.php:122
+msgid "Permission denied."
+msgstr ""
+
+#: includes/admin.php:134
+msgid "Settings saved."
+msgstr ""
+
+#: includes/admin.php:138
+msgid "TermConnect is required and does not appear to be active."
+msgstr ""
+
+#: includes/admin.php:142
+msgid ""
+"Enable the networks you want offered in the editor and shown on your posts, "
+"and drag to set their order. Hashtags and mentions are added to posts "
+"automatically from the inline tokens in your content."
+msgstr ""
+
+#: includes/admin.php:148 includes/term-columns.php:88
+msgid "Networks"
+msgstr ""
+
+#: includes/admin.php:158 includes/taxonomies.php:47 includes/taxonomies.php:49
+msgid "Hashtags"
+msgstr ""
+
+#: includes/admin.php:161 includes/taxonomies.php:73 includes/taxonomies.php:75
+msgid "Mentions"
+msgstr ""
+
+#: includes/admin.php:165
+msgid "Drag to reorder"
+msgstr ""
+
+#: includes/admin.php:176
+msgid "peer aggregation (no external link)"
+msgstr ""
+
+#: includes/admin.php:184
+msgid "Display"
+msgstr ""
+
+#: includes/admin.php:187 includes/networks.php:50
+msgid "Blogosphere"
+msgstr ""
+
+#: includes/admin.php:191
+msgid "Automatically append the Blogosphere section to hashtag archives."
+msgstr ""
+
+#: includes/admin.php:194
+msgid ""
+"When off, place it manually with the [social_blogosphere] shortcode "
+"(recommended for block themes). Requires the Blogosphere network to be "
+"enabled above and WordPress peer sites configured in TermConnect."
+msgstr ""
+
+#: includes/admin.php:199
+msgid "Tokens with no enabled links"
+msgstr ""
+
+#: includes/admin.php:201
+msgid "Link to the local archive"
+msgstr ""
+
+#: includes/admin.php:202
+msgid "Render as plain text (no link)"
+msgstr ""
+
+#: includes/admin.php:203
+msgid ""
+"Applies to both hashtags and mentions whose networks resolve to no links."
+msgstr ""
+
+#: includes/blogosphere.php:213 includes/blogosphere.php:214
+msgid "From around the blogosphere"
+msgstr ""
+
+#: includes/blogosphere.php:239
+msgid "Blogosphere navigation"
+msgstr ""
+
+#: includes/blogosphere.php:242
+msgid "&larr; Newer"
+msgstr ""
+
+#: includes/blogosphere.php:248
+#, php-format
+msgid "Page %1$d of %2$d"
+msgstr ""
+
+#: includes/blogosphere.php:253
+msgid "Older &rarr;"
+msgstr ""
+
+#: includes/link-types.php:135
+msgid "Social network"
+msgstr ""
+
+#: includes/link-types.php:151
+msgid "Local site"
+msgstr ""
+
+#: includes/link-types.php:153
+msgid "A local author profile"
+msgstr ""
+
+#: includes/rest.php:109
+msgid "Invalid taxonomy."
+msgstr ""
+
+#: includes/rest.php:228
+msgid "Invalid mention term."
+msgstr ""
+
+#: includes/taxonomies.php:48
+msgid "Hashtag"
+msgstr ""
+
+#: includes/taxonomies.php:50
+msgid "Search Hashtags"
+msgstr ""
+
+#: includes/taxonomies.php:51
+msgid "All Hashtags"
+msgstr ""
+
+#: includes/taxonomies.php:52
+msgid "Edit Hashtag"
+msgstr ""
+
+#: includes/taxonomies.php:53
+msgid "View Hashtag"
+msgstr ""
+
+#: includes/taxonomies.php:54
+msgid "No hashtags found."
+msgstr ""
+
+#: includes/taxonomies.php:74
+msgid "Mention"
+msgstr ""
+
+#: includes/taxonomies.php:76
+msgid "Search Mentions"
+msgstr ""
+
+#: includes/taxonomies.php:77
+msgid "All Mentions"
+msgstr ""
+
+#: includes/taxonomies.php:78
+msgid "Edit Mention"
+msgstr ""
+
+#: includes/taxonomies.php:79
+msgid "View Mention"
+msgstr ""
+
+#: includes/taxonomies.php:80
+msgid "No mentions found."
+msgstr ""
+
+#: includes/term-columns.php:85
+msgid "Profiles"
+msgstr ""
+
+#: includes/term-columns.php:144
+msgid "Add profiles"
+msgstr ""
+
+#: social-hashtags-mentions.php:101
+msgid ""
+"Social Hashtags & Mentions requires the TermConnect plugin to be installed "
+"and active."
+msgstr ""
+
+#: assets/js/sh-editor.js:520
+msgid "Link this hashtag to:"
+msgstr ""
+
+#: assets/js/sh-editor.js:523
+msgid "No networks enabled."
+msgstr ""
+
+#: assets/js/sh-editor.js:525 assets/js/sh-editor.js:785
+msgid "Apply"
+msgstr ""
+
+#: assets/js/sh-editor.js:776
+msgid "Link this mention to:"
+msgstr ""
+
+#: assets/js/sh-editor.js:782
+msgid ""
+"No profiles are configured for this mention yet. Add them on the mention’s "
+"edit screen."
+msgstr ""
+
+#: assets/js/sh-editor.js:852 assets/js/sh-editor.js:887
+msgid "Create"
+msgstr ""
+
+#: assets/js/sh-editor.js:889
+msgid "user"
+msgstr ""

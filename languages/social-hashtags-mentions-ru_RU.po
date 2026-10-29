@@ -1,0 +1,249 @@
+# Russian translations for social-hashtags-mentions package
+# Английские переводы для пакета social-hashtags-mentions.
+# Copyright (C) 2026 THE social-hashtags-mentions'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the social-hashtags-mentions package.
+# Automatically generated, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: social-hashtags-mentions 1.0.0\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-28 19:46-0400\n"
+"PO-Revision-Date: 2026-07-10 16:04-0400\n"
+"Last-Translator: Automatically generated\n"
+"Language-Team: none\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: includes/admin.php:31
+msgid "Settings"
+msgstr "Настройки"
+
+#: includes/admin.php:43 includes/admin.php:44 includes/admin.php:131
+msgid "Social Hashtags & Mentions"
+msgstr "Social Hashtags & Mentions"
+
+#: includes/admin.php:89 includes/admin.php:122
+msgid "Permission denied."
+msgstr "Доступ запрещён."
+
+#: includes/admin.php:134
+msgid "Settings saved."
+msgstr "Настройки сохранены."
+
+#: includes/admin.php:138
+msgid "TermConnect is required and does not appear to be active."
+msgstr "Требуется TermConnect, но, по-видимому, он не активен."
+
+#: includes/admin.php:142
+msgid ""
+"Enable the networks you want offered in the editor and shown on your posts, "
+"and drag to set their order. Hashtags and mentions are added to posts "
+"automatically from the inline tokens in your content."
+msgstr ""
+"Выберите социальные сети, которые вы хотите показывать в редакторе и — "
+"потенциально — в записях. Вы также можете изменить их порядок при помощи "
+"перетаскивания. Отформатированные хештеги и упоминания ассоциируются с "
+"записями автоматически при их обнаружении в тексте."
+
+#: includes/admin.php:148 includes/term-columns.php:88
+msgid "Networks"
+msgstr "Социальные сети"
+
+#: includes/admin.php:158 includes/taxonomies.php:47 includes/taxonomies.php:49
+msgid "Hashtags"
+msgstr "Хештеги"
+
+#: includes/admin.php:161 includes/taxonomies.php:73 includes/taxonomies.php:75
+msgid "Mentions"
+msgstr "Упоминания"
+
+#: includes/admin.php:165
+msgid "Drag to reorder"
+msgstr "Перетащите для изменения порядка"
+
+#: includes/admin.php:176
+msgid "peer aggregation (no external link)"
+msgstr "агрегация со сторонних сайтов (без внешней ссылки)"
+
+#: includes/admin.php:184
+msgid "Display"
+msgstr "Отображение"
+
+#: includes/admin.php:187 includes/networks.php:50
+msgid "Blogosphere"
+msgstr "Блогосфера"
+
+#: includes/admin.php:191
+msgid "Automatically append the Blogosphere section to hashtag archives."
+msgstr "Автоматически добавлять раздел «Блогосфера» к архивам хештегов."
+
+#: includes/admin.php:194
+msgid ""
+"When off, place it manually with the [social_blogosphere] shortcode "
+"(recommended for block themes). Requires the Blogosphere network to be "
+"enabled above and WordPress peer sites configured in TermConnect."
+msgstr ""
+"Когда отключено, размещайте его вручную с помощью шорткода "
+"[social_blogosphere] (рекомендуется для блочных тем). Требует, чтобы "
+"«Блогосфера» была включена выше, а сторонние сайты WordPress были настроены в"
+" TermConnect."
+
+#: includes/admin.php:199
+msgid "Tokens with no enabled links"
+msgstr "Встречающиеся в тексте хештеги/упоминания без включённых ссылок"
+
+#: includes/admin.php:201
+msgid "Link to the local archive"
+msgstr "Ссылаться на локальный архив"
+
+#: includes/admin.php:202
+msgid "Render as plain text (no link)"
+msgstr "Отображать как обычный текст (без ссылки)"
+
+#: includes/admin.php:203
+msgid ""
+"Applies to both hashtags and mentions whose networks resolve to no links."
+msgstr ""
+"Применяется как к хештегам, так и к упоминаниям без включённых ссылок на "
+"социальные сети."
+
+#: includes/blogosphere.php:213 includes/blogosphere.php:214
+msgid "From around the blogosphere"
+msgstr "Из блогосферы"
+
+#: includes/blogosphere.php:239
+msgid "Blogosphere navigation"
+msgstr "Навигация по блогосфере"
+
+#: includes/blogosphere.php:242
+msgid "&larr; Newer"
+msgstr "&larr; Более новые"
+
+#: includes/blogosphere.php:248
+#, php-format
+msgid "Page %1$d of %2$d"
+msgstr "Страница %1$d из %2$d"
+
+#: includes/blogosphere.php:253
+msgid "Older &rarr;"
+msgstr "Более старые &rarr;"
+
+#: includes/link-types.php:135
+msgid "Social network"
+msgstr "Социальная сеть"
+
+#: includes/link-types.php:151
+msgid "Local site"
+msgstr "Локальный сайт"
+
+#: includes/link-types.php:153
+msgid "A local author profile"
+msgstr "Профиль автора на локальном сайте"
+
+#: includes/rest.php:109
+msgid "Invalid taxonomy."
+msgstr "Недопустимая таксономия."
+
+#: includes/rest.php:228
+msgid "Invalid mention term."
+msgstr "Недопустимое упоминание (термин)."
+
+#: includes/taxonomies.php:48
+msgid "Hashtag"
+msgstr "Хештег"
+
+#: includes/taxonomies.php:50
+msgid "Search Hashtags"
+msgstr "Поиск в хештегах"
+
+#: includes/taxonomies.php:51
+msgid "All Hashtags"
+msgstr "Все хештеги"
+
+#: includes/taxonomies.php:52
+msgid "Edit Hashtag"
+msgstr "Редактировать хештег"
+
+#: includes/taxonomies.php:53
+msgid "View Hashtag"
+msgstr "Просмотреть хештег"
+
+#: includes/taxonomies.php:54
+msgid "No hashtags found."
+msgstr "Хештеги не найдены."
+
+#: includes/taxonomies.php:74
+msgid "Mention"
+msgstr "Упоминание"
+
+#: includes/taxonomies.php:76
+msgid "Search Mentions"
+msgstr "Поиск в упоминаниях"
+
+#: includes/taxonomies.php:77
+msgid "All Mentions"
+msgstr "Все упоминания"
+
+#: includes/taxonomies.php:78
+msgid "Edit Mention"
+msgstr "Редактировать упоминание"
+
+#: includes/taxonomies.php:79
+msgid "View Mention"
+msgstr "Просмотреть упоминание"
+
+#: includes/taxonomies.php:80
+msgid "No mentions found."
+msgstr "Упоминания не найдены."
+
+#: includes/term-columns.php:85
+msgid "Profiles"
+msgstr "Профили"
+
+#: includes/term-columns.php:144
+msgid "Add profiles"
+msgstr "Добавить профили"
+
+#: social-hashtags-mentions.php:100
+msgid ""
+"Social Hashtags & Mentions requires the TermConnect plugin to be installed "
+"and active."
+msgstr ""
+"Social Hashtags & Mentions требует, чтобы плагин TermConnect был установлен и"
+" активен."
+
+#: assets/js/sh-editor.js:520
+msgid "Link this hashtag to:"
+msgstr "Связать этот хештег с:"
+
+#: assets/js/sh-editor.js:523
+msgid "No networks enabled."
+msgstr "Нет включённых социальных сетей."
+
+#: assets/js/sh-editor.js:525 assets/js/sh-editor.js:785
+msgid "Apply"
+msgstr "Сохранить"
+
+#: assets/js/sh-editor.js:776
+msgid "Link this mention to:"
+msgstr "Связать это упоминание с:"
+
+#: assets/js/sh-editor.js:782
+msgid ""
+"No profiles are configured for this mention yet. Add them on the mention’s "
+"edit screen."
+msgstr ""
+"Для этого упоминания ещё не настроено ни одного профиля. Добавьте их на "
+"странице редактирования упоминания."
+
+#: assets/js/sh-editor.js:852 assets/js/sh-editor.js:887
+msgid "Create"
+msgstr "Создать"
+
+#: assets/js/sh-editor.js:889
+msgid "user"
+msgstr "пользователь"

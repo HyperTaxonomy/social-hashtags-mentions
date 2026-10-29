@@ -1,0 +1,224 @@
+/**
+ * Social Hashtags & Mentions — frontend styles.
+ */
+
+/* Inline tokens */
+.sh-token,
+.sh-hashtag,
+.sh-mention {
+	text-decoration: none;
+	font-weight: 600;
+}
+.sh-token--plain {
+	font-weight: 600;
+	opacity: 0.85;
+}
+.sh-token-wrap {
+	position: relative;
+	display: inline-block;
+}
+.sh-token--multi {
+	cursor: pointer;
+}
+
+/* Pane (multi-network hashtag) */
+.sh-pane {
+	position: absolute;
+	z-index: 50;
+	top: 100%;
+	left: 0;
+	margin-top: 0.25em;
+	min-width: 12em;
+	/* Grow to fit the widest link (which never wraps); cap to the viewport. */
+	width: max-content;
+	max-width: 90vw;
+	background: #fff;
+	border: 1px solid #dcdcde;
+	border-radius: 6px;
+	box-shadow: 0 4px 16px rgba( 0, 0, 0, 0.12 );
+	padding: 2px;
+	/* Slightly smaller than surrounding text, to read like the editor popover. */
+	font-size: 0.85em;
+}
+.sh-pane[hidden] {
+	display: none;
+}
+.sh-pane__inner {
+	display: flex;
+	flex-direction: column;
+}
+.sh-pane__link {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 8px;
+	text-decoration: none;
+	border-radius: 4px;
+	color: inherit;
+	white-space: nowrap;
+}
+.sh-pane__link:hover,
+.sh-pane__link:focus {
+	background: #f0f0f1;
+}
+
+/* Inline single-profile mention: network icon + handle, in place of @name */
+.sh-mention--inline {
+	display: inline-flex;
+	align-items: baseline;
+	gap: 0.2em;
+}
+.sh-handle {
+	font-weight: 600;
+}
+.sh-pane__link .sh-handle {
+	font-weight: 400;
+}
+/* Display name shown in parentheses next to a handle */
+.sh-name {
+	font-weight: 400;
+	opacity: 0.7;
+}
+/* "@ Site" suffix for local/peer author profiles */
+.sh-site {
+	font-weight: 400;
+	opacity: 0.7;
+}
+
+/* Network icon wrapper — inline SVG sized/styled to sit like a Dashicon. */
+.sh-icon {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 1em;
+	height: 1em;
+	line-height: 1;
+	vertical-align: text-bottom;
+	flex: 0 0 auto;
+}
+.sh-icon svg {
+	width: 100%;
+	height: 100%;
+	fill: currentColor;
+	display: block;
+}
+
+/* Editor popover */
+.sh-popover__inner {
+	padding: 0.75em 1em;
+	min-width: 16em;
+	/* Grow to fit the longest row label; cap only to the viewport. */
+	max-width: 90vw;
+	width: max-content;
+}
+.sh-popover__inner strong {
+	display: block;
+	margin-bottom: 0.5em;
+}
+.sh-popover__hint {
+	margin: 0 0 0.6em;
+	font-size: 0.85em;
+	color: #757575;
+	/* Let the hint wrap so it doesn't drive the popover width on its own. */
+	max-width: 20em;
+	white-space: normal;
+}
+/* Network rows: icon + checkbox (hashtag networks and mention profiles) */
+.sh-net-row {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 4px 0;
+	/* Keep each label on one line so the popover sizes to fit it. */
+	white-space: nowrap;
+}
+.sh-net-row .components-checkbox-control__label,
+.sh-net-row label {
+	white-space: nowrap;
+	margin: 0;
+	padding: 0;
+}
+/* Icon + label after the checkbox; clicking it also toggles the row. */
+.sh-net-click {
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	cursor: pointer;
+}
+/* Uniform icon box so every row's checkbox lines up, whether the icon is a
+   bundled SVG (.sh-icon, sized in em) or a Dashicon (20px by default). */
+.sh-net-row .sh-icon,
+.sh-net-row .dashicons {
+	flex: 0 0 20px;
+	width: 20px;
+	height: 20px;
+	font-size: 20px;
+	line-height: 20px;
+	text-align: center;
+}
+.sh-net-row .components-base-control,
+.sh-net-row .components-checkbox-control {
+	margin: 0;
+}
+/* Collapse the checkbox control's internal spacing so the checkbox→icon distance
+   is just the row gap (matching the icon→label gap), not row gap + empty-label gap. */
+.sh-net-row .components-base-control__field {
+	margin-bottom: 0;
+	gap: 0;
+}
+.sh-net-row .components-checkbox-control__input-container {
+	margin: 0;
+}
+
+/* Blogosphere section */
+.sh-blogosphere {
+	margin: 2em 0;
+	padding-top: 1em;
+	border-top: 1px solid #e2e4e7;
+}
+.sh-blogosphere__title {
+	font-size: 1.1em;
+	margin: 0 0 0.75em;
+}
+.sh-blogosphere__list {
+	list-style: none;
+	margin: 0;
+	padding: 0;
+	display: grid;
+	gap: 1em;
+}
+.sh-blogosphere__item {
+	display: block;
+}
+.sh-blogosphere__link {
+	display: flex;
+	gap: 0.75em;
+	align-items: flex-start;
+	text-decoration: none;
+	color: inherit;
+	font-weight: 600;
+}
+.sh-blogosphere__thumb {
+	width: 72px;
+	height: 72px;
+	object-fit: cover;
+	border-radius: 4px;
+	flex: 0 0 auto;
+}
+.sh-blogosphere__source {
+	display: inline-block;
+	font-size: 0.8em;
+	opacity: 0.7;
+	margin-top: 0.2em;
+}
+.sh-blogosphere__excerpt {
+	margin: 0.35em 0 0;
+	font-size: 0.9em;
+	opacity: 0.85;
+}
+.sh-blogosphere__pagination {
+	display: flex;
+	gap: 1em;
+	align-items: center;
+	margin-top: 1.25em;
+}
