@@ -56,6 +56,7 @@
 		termId: 'data-sh-term',
 		name: 'data-sh-name',
 		networks: 'data-sh-networks',
+		userId: 'data-sh-user-id',
 	};
 	var HASHTAG_SETTINGS = { tagName: 'a', className: 'sh-hashtag', attributes: TOKEN_ATTRIBUTES };
 	var MENTION_SETTINGS = { tagName: 'a', className: 'sh-mention', attributes: TOKEN_ATTRIBUTES };
@@ -252,35 +253,99 @@
 		return false;
 	}
 
-	// A "word char" for token purposes: a Unicode letter, digit, or underscore — so
-	// scanning stops at whitespace, punctuation, brackets, shortcode delimiters, and the
-	// start/end of the body, not just at spaces.
+	// A "word char" for token purposes: a Unicode letter, mark, digit, or underscore —
+	// so scanning stops at whitespace, punctuation, brackets, shortcode delimiters, and
+	// the start/end of the body, not just at spaces. \p{M} (combining marks) is included
+	// so decomposed/NFD accented text isn't treated as a boundary mid-grapheme.
 	function isWordChar( ch ) {
-		return '' !== ch && /[\p{L}\p{N}_]/u.test( ch );
+		return '' !== ch && /[\p{L}\p{M}\p{N}_]/u.test( ch );
 	}
 
-	// Resolve the token range for a selection: trim selected whitespace, snap both edges
-	// out to the surrounding word boundary (stopping at whitespace/punctuation/body ends),
-	// drop leading punctuation, and detect a matching trigger (#/@) already there so it is
-	// reused, not duplicated. `singleWord` caps the token to the first word (hashtags may
-	// not contain spaces or punctuation); mentions may span words. Returns
-	// { start, end, name, insert } or null when there is nothing to wrap.
-	function resolveTokenRange( text, selStart, selEnd, trigger, singleWord ) {
+	// The full Unicode character ending at `end` (exclusive), treating a surrogate
+	// pair as one character so a supplementary-plane letter/digit isn't split in half
+	// when scanning backward one character at a time.
+	function charBefore( text, end ) {
+		if ( end >= 2 ) {
+			var lo = text.charCodeAt( end - 1 );
+			var hi = text.charCodeAt( end - 2 );
+			if ( lo >= 0xDC00 && lo <= 0xDFFF && hi >= 0xD800 && hi <= 0xDBFF ) {
+				return text.slice( end - 2, end );
+			}
+		}
+		return text.slice( end - 1, end );
+	}
+
+	// The full Unicode character starting at `start`, treating a surrogate pair as
+	// one character so a supplementary-plane letter/digit isn't split in half when
+	// scanning forward one character at a time.
+	function charAfter( text, start ) {
+		if ( start + 1 < text.length ) {
+			var hi = text.charCodeAt( start );
+			var lo = text.charCodeAt( start + 1 );
+			if ( hi >= 0xD800 && hi <= 0xDBFF && lo >= 0xDC00 && lo <= 0xDFFF ) {
+				return text.slice( start, start + 2 );
+			}
+		}
+		return text.slice( start, start + 1 );
+	}
+
+	// Shared boundary walk used by resolveTokenRange() and precedingTrigger(): trims
+	// selected whitespace, snaps both edges out to the surrounding word (Unicode
+	// code-point aware, so a character is never split mid-surrogate-pair), then drops
+	// any remaining leading characters that are neither a word char nor a trigger
+	// (e.g. '(', ','). Trailing characters are kept — a mention may legitimately end in
+	// punctuation ("C#") or contain "@" ("@user@host"). Returns { s, e }, with s >= e
+	// when there is nothing left to anchor a token to.
+	function snapToWordBoundary( text, selStart, selEnd ) {
 		var len = text.length;
 		var s = selStart, e = selEnd;
-		// Trim whitespace at the selection edges.
 		while ( s < e && /\s/.test( text.charAt( s ) ) ) { s++; }
 		while ( e > s && /\s/.test( text.charAt( e - 1 ) ) ) { e--; }
-		// Snap out to the surrounding word.
-		while ( s > 0 && isWordChar( text.charAt( s - 1 ) ) ) { s--; }
-		while ( e < len && isWordChar( text.charAt( e ) ) ) { e++; }
-		// Drop selected leading punctuation (e.g. '(', ',') that is neither a word char
-		// nor a trigger. Trailing characters are kept — a mention may legitimately end in
-		// punctuation ("C#") or contain "@" ("@user@host"); for hashtags the single-word
-		// cap below excludes anything past the first word anyway.
-		while ( s < e && ! isWordChar( text.charAt( s ) ) && '#' !== text.charAt( s ) && '@' !== text.charAt( s ) ) { s++; }
+		while ( s > 0 ) {
+			var cb = charBefore( text, s );
+			if ( ! isWordChar( cb ) ) { break; }
+			s -= cb.length;
+		}
+		while ( e < len ) {
+			var ca = charAfter( text, e );
+			if ( ! isWordChar( ca ) ) { break; }
+			e += ca.length;
+		}
+		while ( s < e ) {
+			var cs = charAfter( text, s );
+			if ( isWordChar( cs ) || '#' === cs || '@' === cs ) { break; }
+			s += cs.length;
+		}
+		return { s: s, e: e };
+	}
+
+	// Resolve the token range for a selection via snapToWordBoundary(), then detect a
+	// matching trigger (#/@) already there so it is reused, not duplicated.
+	// `singleWord` caps the token to the first word (hashtags may not contain spaces or
+	// punctuation); mentions may span words. Returns { start, end, name, insert } or
+	// null when there is nothing to wrap.
+	function resolveTokenRange( text, selStart, selEnd, trigger, singleWord ) {
+		var len = text.length;
+		var bounds = snapToWordBoundary( text, selStart, selEnd );
+		var s = bounds.s, e = bounds.e;
 		if ( s >= e ) {
 			return null;
+		}
+
+		// For mentions, walk back through any "word@" pair that is itself preceded by
+		// more word characters (a Mastodon-style user@host run) so only the construct's
+		// own leading trigger is treated as the trigger — not an internal @ separator
+		// that happens to sit right before a partial selection (e.g. selecting just
+		// "host" out of "@user@host" would otherwise be mistaken for "@host").
+		if ( '@' === trigger ) {
+			while ( s > 1 && '@' === text.charAt( s - 1 ) && isWordChar( charBefore( text, s - 1 ) ) ) {
+				s -= 1;
+				while ( s > 0 ) {
+					var cb2 = charBefore( text, s );
+					if ( ! isWordChar( cb2 ) ) { break; }
+					s -= cb2.length;
+				}
+			}
 		}
 
 		var tokenStart, wordStart, needInsert;
@@ -309,7 +374,11 @@
 		if ( singleWord ) {
 			// Cap to the first word: stop at the first non-word char after the word start.
 			var w = wordStart;
-			while ( w < len && isWordChar( text.charAt( w ) ) ) { w++; }
+			while ( w < len ) {
+				var cw = charAfter( text, w );
+				if ( ! isWordChar( cw ) ) { break; }
+				w += cw.length;
+			}
 			wordEnd = w;
 		}
 		var name = text.slice( wordStart, wordEnd ).trim();
@@ -323,11 +392,8 @@
 	// Used to disable one tool when the other's trigger is already present, preventing
 	// "@#word" / "#@word".
 	function precedingTrigger( text, selStart, selEnd ) {
-		var s = selStart, e = selEnd;
-		while ( s < e && /\s/.test( text.charAt( s ) ) ) { s++; }
-		while ( e > s && /\s/.test( text.charAt( e - 1 ) ) ) { e--; }
-		while ( s > 0 && isWordChar( text.charAt( s - 1 ) ) ) { s--; }
-		while ( s < e && ! isWordChar( text.charAt( s ) ) && '#' !== text.charAt( s ) && '@' !== text.charAt( s ) ) { s++; }
+		var bounds = snapToWordBoundary( text, selStart, selEnd );
+		var s = bounds.s, e = bounds.e;
 		if ( s >= e ) {
 			return '';
 		}
@@ -828,6 +894,10 @@
 			'data-sh-term': opt.id ? String( opt.id ) : '',
 			'data-sh-name': opt.id ? '' : ( opt.name || opt.slug ),
 			'data-sh-networks': '*',
+			// Carries the WordPress user ID for a local-user result (see
+			// mentionCompleter() below), so the server can resolve/create the term by
+			// that identity instead of by display-name text alone.
+			'data-sh-user-id': opt.userId ? String( opt.userId ) : '',
 		}, display );
 	}
 
@@ -873,7 +943,10 @@
 						return { id: t.id, name: t.name, slug: t.slug, url: t.url };
 					} );
 					var users = ( res[ 1 ] || [] ).map( function ( u ) {
-						return { id: 0, name: u.name, slug: u.slug, url: u.url, isUser: true };
+						// id is the (not yet created) term's id, which doesn't exist yet for a
+						// local-user result — userId carries the real WP user id instead, so
+						// the server can tie the new term to that person (see mentionElement()).
+						return { id: 0, name: u.name, slug: u.slug, url: u.url, isUser: true, userId: u.id };
 					} );
 					var opts = terms.concat( users );
 					if ( query && ! opts.length ) {

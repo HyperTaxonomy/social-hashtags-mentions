@@ -60,11 +60,27 @@ function sh_register_rest_routes(): void {
     register_rest_route( $ns, '/handles', array(
         'methods'             => WP_REST_Server::READABLE,
         'callback'            => 'sh_rest_get_handles',
-        'permission_callback' => 'sh_rest_can_edit',
+        'permission_callback' => 'sh_rest_can_edit_handles',
         'args'                => array(
             'term_id' => array( 'required' => true, 'type' => 'integer' ),
         ),
     ) );
+}
+
+/**
+ * Permission callback for GET /handles: requires edit_posts *and* the ability
+ * to edit the specific mention term, so a Contributor/Author can't enumerate
+ * another term's configured network handles just by guessing term IDs.
+ *
+ * @since 1.0.1
+ * @param WP_REST_Request $request Request.
+ * @return bool
+ */
+function sh_rest_can_edit_handles( WP_REST_Request $request ): bool {
+    if ( ! current_user_can( 'edit_posts' ) ) {
+        return false;
+    }
+    return current_user_can( 'edit_term', (int) $request->get_param( 'term_id' ) );
 }
 
 /**
@@ -170,7 +186,7 @@ function sh_rest_search_users( WP_REST_Request $request ) {
  */
 function sh_collect_handles( int $term_id ): array {
     $term = get_term( $term_id, 'mention' );
-    if ( ! ( $term instanceof WP_Term ) || ! function_exists( 'sh_mention_universe' ) ) {
+    if ( ! ( $term instanceof WP_Term ) ) {
         return array();
     }
     $links = function_exists( 'tc_get_term_links' ) ? tc_get_term_links( $term_id ) : array();
@@ -183,9 +199,7 @@ function sh_collect_handles( int $term_id ): array {
         if ( $def && empty( $def['internal'] ) ) {
             // Show the handle (or "handle (Name)") — the icon identifies the network.
             $handle = (string) ( $links[ 'social_' . $slug ] ?? '' );
-            $name   = ( '' !== $handle && function_exists( 'sh_link_name' ) )
-                ? sh_link_name( $term_id, 'social_' . $slug, $handle )
-                : '';
+            $name   = ( '' !== $handle ) ? sh_link_name( $term_id, 'social_' . $slug, $handle ) : '';
             $out[] = array(
                 'network' => $slug,
                 'label'   => ( '' !== $handle && '' !== $name ) ? $handle . ' (' . $name . ')' : $handle,
@@ -198,10 +212,8 @@ function sh_collect_handles( int $term_id ): array {
         if ( $type ) {
             // WordPress author profile: show "Name @ Site".
             $handle = (string) ( $links[ $slug ] ?? '' );
-            $name   = function_exists( 'sh_link_name' ) ? sh_link_name( $term_id, $slug, $handle ) : '';
-            $site   = function_exists( 'sh_author_site_name' )
-                ? sh_author_site_name( $slug, (string) ( $type['label'] ?? $slug ) )
-                : (string) ( $type['label'] ?? $slug );
+            $name   = sh_link_name( $term_id, $slug, $handle );
+            $site   = sh_author_site_name( $slug, (string) ( $type['label'] ?? $slug ) );
             $out[]  = array(
                 'network' => $slug,
                 'label'   => ( '' !== $name ? $name : $handle ) . ' @ ' . $site,

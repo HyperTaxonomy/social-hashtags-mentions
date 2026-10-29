@@ -37,9 +37,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @return array[] [ slug => definition ]
  */
 function sh_get_network_registry(): array {
-    static $registry = null;
-    if ( null !== $registry ) {
-        return $registry;
+    // Keyed by blog ID so any multisite caller that switch_to_blog()s between
+    // sites within one request (the plugin's own uninstall.php iterates sites
+    // this way, and third-party tooling may do the same) never gets served a
+    // different site's cached/filtered registry.
+    static $cache = array();
+    $blog_id = get_current_blog_id();
+    if ( isset( $cache[ $blog_id ] ) ) {
+        return $cache[ $blog_id ];
     }
 
     // Ordered roughly by global popularity, with the built-in Blogosphere pinned first.
@@ -226,6 +231,8 @@ function sh_get_network_registry(): array {
     }
     $registry = $with_hashtag + $mention_only;
 
+    $cache[ $blog_id ] = $registry;
+
     return $registry;
 }
 
@@ -344,6 +351,11 @@ function sh_network_color( string $slug ): string {
         'mastodon'    => '#6364FF',
         'substack'    => '#FF6719',
         'livejournal' => '#00B0EA',
+        // Dreamwidth has no Simple Icons entry (see assets/icons/README.md), so
+        // this is an approximation of its teal site accent, not a sourced brand
+        // value like the others above — verify against Dreamwidth's own brand
+        // guide before treating it as authoritative.
+        'dreamwidth'  => '#00707A',
     );
     return $colors[ $slug ] ?? '';
 }

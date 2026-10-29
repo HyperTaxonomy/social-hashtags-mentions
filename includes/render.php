@@ -66,8 +66,10 @@ function sh_render_tokens( string $content ): string {
         return $content;
     }
 
+    // Attribute portion is quote-aware so a literal '>' inside a quoted attribute
+    // value (e.g. title="a > b") doesn't truncate the match early.
     return (string) preg_replace_callback(
-        '/<a\b([^>]*)>(.*?)<\/a>/is',
+        '/<a\b((?:[^>"\']|"[^"]*"|\'[^\']*\')*)>(.*?)<\/a>/is',
         'sh_render_token_callback',
         $content
     );
