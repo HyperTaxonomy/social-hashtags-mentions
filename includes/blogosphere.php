@@ -311,5 +311,12 @@ function sh_blogosphere_auto_append( $query ): void {
         return;
     }
     $done = true;
-    echo wp_kses_post( sh_render_blogosphere() );
+    // No kses pass: this is self-generated markup, not user input. Every dynamic
+    // value in sh_render_blogosphere() is already escaped at output time (esc_html(),
+    // esc_url(), esc_attr()/_e()) — the same as the [social_blogosphere] shortcode path
+    // (sh_blogosphere_shortcode()), which echoes this function's return value directly.
+    // wp_kses_post() here only stripped aria-label from <section>/<nav> (not in its
+    // default allowlist), making this path's output less accessible than the shortcode's
+    // for no security benefit.
+    echo sh_render_blogosphere();
 }
