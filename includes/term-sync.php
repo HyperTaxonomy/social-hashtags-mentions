@@ -148,7 +148,10 @@ function sh_extract_tokens( string $content ): array {
  * @return string Unescaped value, or '' if absent.
  */
 function sh_token_attr( string $attrs, string $name ): string {
-    $pattern = '/\b' . preg_quote( $name, '/' ) . '=("|\')(.*?)\1/i';
+    // (?<=^|\s): the name must start right after whitespace or the start of the
+    // attribute list, not just any word-boundary — so "data-evil-data-sh-tax" can't
+    // be misread as "data-sh-tax" the way a generic \b boundary would allow.
+    $pattern = '/(?<=^|\s)' . preg_quote( $name, '/' ) . '=("|\')(.*?)\1/i';
     if ( preg_match( $pattern, $attrs, $m ) ) {
         return html_entity_decode( $m[2], ENT_QUOTES | ENT_HTML5, 'UTF-8' );
     }
@@ -217,8 +220,17 @@ function sh_get_or_create_term( string $name, string $taxonomy, int $user_id = 0
         $existing = term_exists( $name, $taxonomy );
         if ( $existing ) {
             $term_id = (int) ( is_array( $existing ) ? $existing['term_id'] : $existing );
-            sh_set_term_user_link( $term_id, $user_id );
-            return $term_id;
+
+            // Same ownership check as above, mirrored: never silently reassign a term
+            // already linked to a different user, even at the disambiguated name.
+            $linked_user = (int) get_term_meta( $term_id, '_sh_user_id', true );
+            if ( 0 === $linked_user || $linked_user === $user_id ) {
+                sh_set_term_user_link( $term_id, $user_id );
+                return $term_id;
+            }
+            // Falls through to wp_insert_term()/retry below — not reachable today,
+            // since WordPress's nicename uniqueness means two different users can
+            // never produce this same disambiguated string.
         }
     }
 

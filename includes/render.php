@@ -588,7 +588,10 @@ function sh_mention_label_html( array $t ): string {
  */
 function sh_set_attr( string $attrs, string $name, string $value ): string {
     $escaped     = esc_url( $value );
-    $pattern     = '/\b' . preg_quote( $name, '/' ) . '=("|\').*?\1/i';
+    // (?<=^|\s): the name must start right after whitespace or the start of the
+    // attribute list, not just any word-boundary — so "data-evil-data-sh-tax" can't
+    // be misread as "data-sh-tax" the way a generic \b boundary would allow.
+    $pattern     = '/(?<=^|\s)' . preg_quote( $name, '/' ) . '=("|\').*?\1/i';
     $replacement = $name . '="' . $escaped . '"';
     if ( preg_match( $pattern, $attrs ) ) {
         return (string) preg_replace( $pattern, $replacement, $attrs, 1 );
@@ -607,7 +610,8 @@ function sh_set_attr( string $attrs, string $name, string $value ): string {
  */
 function sh_set_text_attr( string $attrs, string $name, string $value ): string {
     $replacement = $name . '="' . esc_attr( $value ) . '"';
-    $pattern     = '/\b' . preg_quote( $name, '/' ) . '=("|\').*?\1/i';
+    // (?<=^|\s): see sh_set_attr() above.
+    $pattern     = '/(?<=^|\s)' . preg_quote( $name, '/' ) . '=("|\').*?\1/i';
     if ( preg_match( $pattern, $attrs ) ) {
         return (string) preg_replace( $pattern, $replacement, $attrs, 1 );
     }
@@ -623,9 +627,10 @@ function sh_set_text_attr( string $attrs, string $name, string $value ): string 
  * @return string
  */
 function sh_add_class( string $attrs, string $class ): string {
-    if ( preg_match( '/\bclass=("|\')(.*?)\1/i', $attrs, $m ) ) {
+    // (?<=^|\s): see sh_set_attr() above.
+    if ( preg_match( '/(?<=^|\s)class=("|\')(.*?)\1/i', $attrs, $m ) ) {
         $classes = $m[2] . ' ' . $class;
-        return (string) preg_replace( '/\bclass=("|\').*?\1/i', 'class="' . esc_attr( $classes ) . '"', $attrs, 1 );
+        return (string) preg_replace( '/(?<=^|\s)class=("|\').*?\1/i', 'class="' . esc_attr( $classes ) . '"', $attrs, 1 );
     }
     return rtrim( $attrs ) . ' class="' . esc_attr( $class ) . '"';
 }
