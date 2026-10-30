@@ -176,6 +176,14 @@ function sh_get_or_create_term( string $name, string $taxonomy, int $user_id = 0
         return 0;
     }
 
+    // data-sh-user-id comes from post content, which any author can hand-edit. Only
+    // trust it when it names a real user whose name matches the mention text (always
+    // true for a pick from the @ autocomplete); otherwise resolve by name alone, so a
+    // token can't claim another person's mention term or point it at a different user.
+    if ( $user_id > 0 && ! sh_user_matches_mention_name( $user_id, $name ) ) {
+        $user_id = 0;
+    }
+
     if ( $user_id > 0 && 'mention' === $taxonomy ) {
         $linked_term_id = sh_get_term_by_user_id( $user_id );
         if ( $linked_term_id > 0 ) {
@@ -266,6 +274,32 @@ function sh_disambiguate_term_name( string $name, int $user_id ): string {
     $user = get_user_by( 'id', $user_id );
     $tag  = $user ? $user->user_nicename : (string) $user_id;
     return $name . ' (' . $tag . ')';
+}
+
+/**
+ * Whether a mention token's text names the given user.
+ *
+ * True when the user exists and the text matches their display name, nicename, or
+ * login (case-insensitive). The @ autocomplete always inserts the display name.
+ *
+ * @since 1.0.0
+ * @param int    $user_id WordPress user ID from the token.
+ * @param string $name    Mention text from the token.
+ * @return bool
+ */
+function sh_user_matches_mention_name( int $user_id, string $name ): bool {
+    $user = get_user_by( 'id', $user_id );
+    if ( ! $user ) {
+        return false;
+    }
+    $lower = function_exists( 'mb_strtolower' ) ? 'mb_strtolower' : 'strtolower';
+    $name  = $lower( trim( $name ) );
+    foreach ( array( $user->display_name, $user->user_nicename, $user->user_login ) as $candidate ) {
+        if ( '' !== (string) $candidate && $lower( trim( (string) $candidate ) ) === $name ) {
+            return true;
+        }
+    }
+    return false;
 }
 
 /**

@@ -60,27 +60,14 @@ function sh_register_rest_routes(): void {
     register_rest_route( $ns, '/handles', array(
         'methods'             => WP_REST_Server::READABLE,
         'callback'            => 'sh_rest_get_handles',
-        'permission_callback' => 'sh_rest_can_edit_handles',
+        // edit_posts, not edit_term: every author writing a mention needs the term's
+        // handles for the editor's profile picker, and the handles are public anyway
+        // (rendered with the mention on the front end).
+        'permission_callback' => 'sh_rest_can_edit',
         'args'                => array(
             'term_id' => array( 'required' => true, 'type' => 'integer' ),
         ),
     ) );
-}
-
-/**
- * Permission callback for GET /handles: requires edit_posts *and* the ability
- * to edit the specific mention term, so a Contributor/Author can't enumerate
- * another term's configured network handles just by guessing term IDs.
- *
- * @since 1.0.0
- * @param WP_REST_Request $request Request.
- * @return bool
- */
-function sh_rest_can_edit_handles( WP_REST_Request $request ): bool {
-    if ( ! current_user_can( 'edit_posts' ) ) {
-        return false;
-    }
-    return current_user_can( 'edit_term', (int) $request->get_param( 'term_id' ) );
 }
 
 /**

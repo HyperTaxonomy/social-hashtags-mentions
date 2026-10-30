@@ -38,7 +38,7 @@ The plugin registers a `wp_kses_allowed_html` filter (`sh_kses_allowed_html()` i
 
 ### Mention identity
 
-A mention created by picking a **local user** from the `@` autocomplete (rather than an existing term or free text) carries that user's ID in `data-sh-user-id`. On save, `sh_get_or_create_term()` resolves/creates the term by that identity:
+A mention created by picking a **local user** from the `@` autocomplete (rather than an existing term or free text) carries that user's ID in `data-sh-user-id`. Because post content can be hand-edited, the ID is honored only when it belongs to an existing user whose display name, nicename, or login matches the mention text (`sh_user_matches_mention_name()`); otherwise the mention is resolved by name only. On save, `sh_get_or_create_term()` resolves/creates the term by that identity:
 
 - If a mention term already linked to that user exists (tracked via the `_sh_user_id` term meta), it's reused.
 - Otherwise, an unlinked term that happens to share the user's display name is claimed for them; a term already linked to a *different* user is left alone and a distinctly-named term is created instead (WordPress itself disallows two terms with the same name in a flat taxonomy), so two different people with the same display name are never silently merged.
