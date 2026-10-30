@@ -10,7 +10,7 @@
 set -e
 
 PLUGIN_SLUG="social-hashtags-mentions"
-SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd -W)"
+SRC="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 DIST="$SRC/dist"
 ZIP="$DIST/$PLUGIN_SLUG.zip"
 
