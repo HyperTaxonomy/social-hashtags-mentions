@@ -228,9 +228,11 @@ function sh_get_or_create_term( string $name, string $taxonomy, int $user_id = 0
                 sh_set_term_user_link( $term_id, $user_id );
                 return $term_id;
             }
-            // Falls through to wp_insert_term()/retry below — not reachable today,
-            // since WordPress's nicename uniqueness means two different users can
-            // never produce this same disambiguated string.
+            // Linked to a different user: use the term by name, but never relink it.
+            // (Returning here matters: falling through, wp_insert_term() would fail on
+            // the existing name and the retry below would link it anyway.) Not reachable
+            // today, since nicenames are unique, so two users can't share this name.
+            return $term_id;
         }
     }
 
