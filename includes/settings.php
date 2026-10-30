@@ -25,6 +25,15 @@ const SH_OPTION = 'sh_settings';
  * @return array{networks: array<string,bool>}
  */
 function sh_get_settings(): array {
+    // Keyed by blog ID, same reasoning as sh_get_network_registry(): a multisite
+    // caller that switch_to_blog()s between sites within one request must never be
+    // served a different site's cached settings.
+    static $cache = array();
+    $blog_id = get_current_blog_id();
+    if ( isset( $cache[ $blog_id ] ) ) {
+        return $cache[ $blog_id ];
+    }
+
     $stored   = get_option( SH_OPTION, array() );
     $stored   = is_array( $stored ) ? $stored : array();
     $networks = isset( $stored['networks'] ) && is_array( $stored['networks'] ) ? $stored['networks'] : array();
@@ -46,11 +55,12 @@ function sh_get_settings(): array {
 
     $no_link = isset( $stored['hashtag_no_link'] ) && 'plain' === $stored['hashtag_no_link'] ? 'plain' : 'archive';
 
-    return array(
+    $cache[ $blog_id ] = array(
         'networks'                => $normalized,
         'blogosphere_auto_append' => ! isset( $stored['blogosphere_auto_append'] ) || ! empty( $stored['blogosphere_auto_append'] ),
         'hashtag_no_link'         => $no_link,
     );
+    return $cache[ $blog_id ];
 }
 
 /**

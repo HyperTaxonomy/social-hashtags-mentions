@@ -112,7 +112,13 @@ function sh_blogosphere_pool( string $hashtag_slug, int $fetch_size = 30 ): arra
         return array();
     }
 
-    $cache_key = 'sh_bg_pool_' . md5( $hashtag_slug . '|' . $fetch_size );
+    // Peer origins are folded into the cache key (sorted, so key order doesn't
+    // matter) so adding or removing a peer naturally produces a fresh key instead
+    // of serving a pool cached under the old peer set for up to $ttl.
+    $peers        = sh_blogosphere_peers();
+    $peer_origins = wp_list_pluck( $peers, 'origin' );
+    sort( $peer_origins );
+    $cache_key = 'sh_bg_pool_' . md5( $hashtag_slug . '|' . $fetch_size . '|' . implode( ',', $peer_origins ) );
     $cached    = get_transient( $cache_key );
     if ( false !== $cached ) {
         return (array) $cached;
@@ -127,7 +133,7 @@ function sh_blogosphere_pool( string $hashtag_slug, int $fetch_size = 30 ): arra
     $ttl = (int) apply_filters( 'sh_blogosphere_cache_ttl', HOUR_IN_SECONDS );
 
     $merged = array();
-    foreach ( sh_blogosphere_peers() as $peer ) {
+    foreach ( $peers as $peer ) {
         $remote_id = tc_external_resolve_term_id( $peer['origin'], 'hashtag', $hashtag_slug );
         if ( ! $remote_id ) {
             continue;
