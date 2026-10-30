@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: social-hashtags-mentions 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 21:35-0400\n"
+"POT-Creation-Date: 2026-10-30 08:35-0400\n"
 "PO-Revision-Date: 2026-07-10 16:04-0400\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
@@ -112,24 +112,24 @@ msgstr ""
 "Применяется как к хештегам, так и к упоминаниям без включённых ссылок на "
 "социальные сети."
 
-#: includes/blogosphere.php:213 includes/blogosphere.php:214
+#: includes/blogosphere.php:219 includes/blogosphere.php:220
 msgid "From around the blogosphere"
 msgstr "Из блогосферы"
 
-#: includes/blogosphere.php:239
+#: includes/blogosphere.php:245
 msgid "Blogosphere navigation"
 msgstr "Навигация по блогосфере"
 
-#: includes/blogosphere.php:242
+#: includes/blogosphere.php:248
 msgid "&larr; Newer"
 msgstr "&larr; Более новые"
 
-#: includes/blogosphere.php:248
+#: includes/blogosphere.php:254
 #, php-format
 msgid "Page %1$d of %2$d"
 msgstr "Страница %1$d из %2$d"
 
-#: includes/blogosphere.php:253
+#: includes/blogosphere.php:259
 msgid "Older &rarr;"
 msgstr "Более старые &rarr;"
 
@@ -153,7 +153,8 @@ msgstr "Недопустимая таксономия."
 msgid "Invalid mention term."
 msgstr "Недопустимое упоминание (термин)."
 
-#: includes/taxonomies.php:48
+#: includes/taxonomies.php:48 assets/js/sh-editor.js:565
+#: assets/js/sh-editor.js:863
 msgid "Hashtag"
 msgstr "Хештег"
 
@@ -177,7 +178,8 @@ msgstr "Просмотреть хештег"
 msgid "No hashtags found."
 msgstr "Хештеги не найдены."
 
-#: includes/taxonomies.php:74
+#: includes/taxonomies.php:74 assets/js/sh-editor.js:821
+#: assets/js/sh-editor.js:868
 msgid "Mention"
 msgstr "Упоминание"
 

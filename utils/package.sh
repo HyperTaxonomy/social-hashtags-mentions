@@ -17,7 +17,8 @@ ZIP="$DIST/$PLUGIN_SLUG.zip"
 # ---------------------------------------------------------------------------
 # Translations: compile .mo from every .po, and (re)generate the editor-script
 # JSON (<domain>-<locale>-<handle>.json) so bundled translations stay in sync.
-# The editor script is not a block, so its handle is supplied via EXTRA_HANDLES.
+# The editor script is not a block, so its handle and source file are supplied via
+# EXTRA_HANDLES (handle=path).
 # Requires GNU gettext (msgfmt). No-op if there are no .po files.
 # ---------------------------------------------------------------------------
 
@@ -27,7 +28,7 @@ for po in "$SRC"/languages/*-*.po; do
     msgfmt "$po" -o "${po%.po}.mo"
     base="$(basename "$po" .po)"        # e.g. social-hashtags-mentions-ru_RU
     locale="${base#${PLUGIN_SLUG}-}"    # e.g. ru_RU
-    EXTRA_HANDLES='sh-editor' python "$SRC/utils/make-json.py" "$SRC" "$PLUGIN_SLUG" "$locale"
+    EXTRA_HANDLES='sh-editor=assets/js/sh-editor.js' python "$SRC/utils/make-json.py" "$SRC" "$PLUGIN_SLUG" "$locale"
 done
 echo ""
 

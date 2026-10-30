@@ -1,14 +1,14 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
-# This file is distributed under the same license as the social-hashtags-mentions package.
+# This file is distributed under the same license as the PACKAGE package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
 #
 #, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: social-hashtags-mentions 1.0.0\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 21:35-0400\n"
+"POT-Creation-Date: 2026-10-30 08:35-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -100,24 +100,24 @@ msgid ""
 "Applies to both hashtags and mentions whose networks resolve to no links."
 msgstr ""
 
-#: includes/blogosphere.php:213 includes/blogosphere.php:214
+#: includes/blogosphere.php:219 includes/blogosphere.php:220
 msgid "From around the blogosphere"
 msgstr ""
 
-#: includes/blogosphere.php:239
+#: includes/blogosphere.php:245
 msgid "Blogosphere navigation"
 msgstr ""
 
-#: includes/blogosphere.php:242
+#: includes/blogosphere.php:248
 msgid "&larr; Newer"
 msgstr ""
 
-#: includes/blogosphere.php:248
+#: includes/blogosphere.php:254
 #, php-format
 msgid "Page %1$d of %2$d"
 msgstr ""
 
-#: includes/blogosphere.php:253
+#: includes/blogosphere.php:259
 msgid "Older &rarr;"
 msgstr ""
 
@@ -141,7 +141,8 @@ msgstr ""
 msgid "Invalid mention term."
 msgstr ""
 
-#: includes/taxonomies.php:48
+#: includes/taxonomies.php:48 assets/js/sh-editor.js:565
+#: assets/js/sh-editor.js:863
 msgid "Hashtag"
 msgstr ""
 
@@ -165,7 +166,8 @@ msgstr ""
 msgid "No hashtags found."
 msgstr ""
 
-#: includes/taxonomies.php:74
+#: includes/taxonomies.php:74 assets/js/sh-editor.js:821
+#: assets/js/sh-editor.js:868
 msgid "Mention"
 msgstr ""
 
