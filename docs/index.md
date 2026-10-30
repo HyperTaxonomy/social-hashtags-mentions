@@ -37,7 +37,7 @@ Social Hashtags & Mentions is **built on TermConnect**, which it requires: TermC
 
 | Item | Version |
 |------|---------|
-| WordPress | 5.8+ |
+| WordPress | 6.6+ |
 | PHP | 7.4+ |
 | TermConnect | required |
 | HyperTaxonomy | optional (relevance search, relationships) |
