@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: social-hashtags-mentions 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-29 13:55-0400\n"
+"POT-Creation-Date: 2026-10-29 21:35-0400\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,7 +68,7 @@ msgstr ""
 msgid "Display"
 msgstr ""
 
-#: includes/admin.php:187 includes/networks.php:50
+#: includes/admin.php:187 includes/networks.php:55
 msgid "Blogosphere"
 msgstr ""
 
@@ -133,11 +133,11 @@ msgstr ""
 msgid "A local author profile"
 msgstr ""
 
-#: includes/rest.php:109
+#: includes/rest.php:112
 msgid "Invalid taxonomy."
 msgstr ""
 
-#: includes/rest.php:228
+#: includes/rest.php:227
 msgid "Invalid mention term."
 msgstr ""
 
@@ -203,32 +203,32 @@ msgid ""
 "and active."
 msgstr ""
 
-#: assets/js/sh-editor.js:520
+#: assets/js/sh-editor.js:586
 msgid "Link this hashtag to:"
 msgstr ""
 
-#: assets/js/sh-editor.js:523
+#: assets/js/sh-editor.js:589
 msgid "No networks enabled."
 msgstr ""
 
-#: assets/js/sh-editor.js:525 assets/js/sh-editor.js:785
+#: assets/js/sh-editor.js:591 assets/js/sh-editor.js:851
 msgid "Apply"
 msgstr ""
 
-#: assets/js/sh-editor.js:776
+#: assets/js/sh-editor.js:842
 msgid "Link this mention to:"
 msgstr ""
 
-#: assets/js/sh-editor.js:782
+#: assets/js/sh-editor.js:848
 msgid ""
 "No profiles are configured for this mention yet. Add them on the mention’s "
 "edit screen."
 msgstr ""
 
-#: assets/js/sh-editor.js:852 assets/js/sh-editor.js:887
+#: assets/js/sh-editor.js:922 assets/js/sh-editor.js:960
 msgid "Create"
 msgstr ""
 
-#: assets/js/sh-editor.js:889
+#: assets/js/sh-editor.js:962
 msgid "user"
 msgstr ""
