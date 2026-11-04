@@ -17,7 +17,7 @@ Networks declare which taxonomies they support — most support both hashtags an
 Two display options live on the same screen:
 
 - **Blogosphere** — auto-append the aggregated peer-post section to hashtag archives (see below).
-- **Hashtags with no enabled links** — link them to the local hashtag archive, or render them as plain text.
+- **Tokens with no enabled links** — link them to the local archive, or render them as plain text.
 
 ## Writing hashtags and mentions
 
