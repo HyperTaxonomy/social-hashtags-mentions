@@ -7,17 +7,7 @@ nav_order: 1
 
 Write `#hashtags` and `@mentions` inline in the block editor and let them become real taxonomy terms — assigned to your posts automatically from the tokens in your content, with no taxonomy box to maintain. Each token links out to the social networks you choose: hashtags to a network's hashtag page, mentions to a person's profile. Enable and order networks once; the choice applies everywhere, and the front end renders the right links at display time.
 
-## Part of the HyperTaxonomy suite
-
-One of five interoperable WordPress plugins for richer, connected taxonomies. Each works on its own; together they share a common term model. Learn more at [hypertaxonomy.org](https://hypertaxonomy.org).
-
-- **[HyperTaxonomy](https://hypertaxonomy.org/hypertaxonomy/)** — the core: term groups, inclusions, synonyms, redirects, icons, relevance-scored search, and enhanced archives.
-- **[TermConnect](https://hypertaxonomy.org/termconnect/)** — link terms to knowledge-base identifiers (Wikidata, GeoNames, LCSH…) and peer sites; delegated identity, shared vocabularies, and cross-site related content.
-- **Social Hashtags & Mentions** (this plugin) — inline #hashtags and @mentions as taxonomy terms, linked to the social networks you enable.
-- **[As the Crow Flies](https://hypertaxonomy.org/as-the-crow-flies/)** — attach physical locations to terms and filter content by distance/proximity.
-- **[WP-SKOS](https://hypertaxonomy.org/wp-skos/)** — expose your taxonomies as SKOS linked data via a Skosmos-compatible REST API.
-
-Social Hashtags & Mentions is **built on TermConnect**, which it requires: TermConnect provides the link-type registry, identifier storage and cross-site matching, and the peer-fetch API this plugin builds on.
+Part of the [HyperTaxonomy suite](https://hypertaxonomy.org) of interoperable WordPress taxonomy plugins. Built on [TermConnect](https://hypertaxonomy.org/termconnect/), which it requires: TermConnect provides the link-type registry, identifier storage and cross-site matching, and the peer-fetch API this plugin builds on.
 
 ## How it works
 
