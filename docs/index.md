@@ -15,8 +15,8 @@ Part of the [HyperTaxonomy suite](https://hypertaxonomy.org) of interoperable Wo
 - **Inline tokens** — type `#` or `@` in any rich-text field to autocomplete existing terms and local users. A small panel on each token picks which networks it links to (hashtags) or which of the person's configured profiles to show (mentions); mention handles are set once on the term's edit screen.
 - **Smart links at render time** — one enabled network links straight to it; several open a small pane of choices; none links to the local archive (or renders as plain text). A mention with a single profile renders inline as the network icon + handle.
 - **Network ordering** — enable and drag-to-order networks in *Settings → Social Hashtags & Mentions*. The order drives the editor and the front end; disabling a network removes its links everywhere at once.
-- **Blogosphere** — a hashtag-only, built-in option that aggregates post summaries sharing a hashtag across your WordPress peer sites (via TermConnect) onto the hashtag archive, each linking out to the peer.
-- **Federation for free** — because handles are stored as TermConnect identifiers, mentions match across peer sites by their shared profile URI even when term slugs and labels differ.
+- **Blogosphere** — a built-in option that aggregates post summaries sharing a hashtag across your WordPress peer sites (via TermConnect) onto the hashtag archive, each linking out to the peer. On mentions, it turns a person's WordPress author profiles on or off.
+- **Federation** — because handles are stored as TermConnect identifiers, mentions match across peer sites running this plugin by their shared profile URI, even when term slugs and labels differ.
 
 ## Documentation map
 

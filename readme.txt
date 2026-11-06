@@ -24,11 +24,11 @@ Enable and **drag to order** the networks you want in Settings → Social Hashta
 
 = Blogosphere =
 
-The built-in **Blogosphere** is a hashtag-only option that aggregates post summaries sharing a hashtag from your configured WordPress peer sites (via TermConnect) and shows them on the hashtag archive. Each summary links out to the peer's own post — nothing is copied locally.
+The built-in **Blogosphere** aggregates post summaries sharing a hashtag from your configured WordPress peer sites (via TermConnect) and shows them on the hashtag archive. Each summary links out to the peer's own post — nothing is copied locally. Peers need this plugin too. On mentions, it turns a person's WordPress author profiles on or off.
 
 = Federation =
 
-Since this plugin is built on TermConnect, hashtags and mentions federate across peer sites for free. Mentions are matched across sites by their shared network handle (the resulting profile URI), so the same person is recognized even when term slugs and labels differ between sites.
+Since this plugin is built on TermConnect, hashtags and mentions can federate across peer sites that also run it. Mentions are matched across sites by their shared network handle (the resulting profile URI), so the same person is recognized even when term slugs and labels differ between sites.
 
 = Requirements =
 
@@ -51,11 +51,15 @@ Automatically. On save, the plugin reconciles each post's `hashtag` and `mention
 
 = Where are mention handles entered? =
 
-On the mention term's edit screen (Mentions → edit a term → External Links), where each network's handle (and any peer/local author profile) is configured once and reused everywhere that person is mentioned. In the post editor, the mention's toolbar panel only selects which of those configured profiles to show for that instance.
+On the mention term's edit screen (Posts → Mentions → edit a term → External Links), where each network's handle (and any peer/local author profile) is configured once and reused everywhere that person is mentioned. In the post editor, the mention's toolbar panel only selects which of those configured profiles to show for that instance.
 
 = How do I place the Blogosphere list? =
 
 It auto-appends to hashtag archives when enabled. For precise placement (especially in block themes) use the `[social_blogosphere]` shortcode.
+
+= What happens to my data if I delete the plugin? =
+
+Settings and cached data are removed. Hashtag and mention terms are always kept. Mention handles are kept too unless you turn on **Delete data on uninstall** in the settings.
 
 == Screenshots ==
 

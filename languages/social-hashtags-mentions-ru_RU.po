@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: social-hashtags-mentions 1.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 08:35-0400\n"
-"PO-Revision-Date: 2026-10-30 08:49-0400\n"
+"POT-Creation-Date: 2026-11-06 03:27-0500\n"
+"PO-Revision-Date: 2026-11-06 03:27-0500\n"
 "Last-Translator: Automatically generated\n"
 "Language-Team: none\n"
 "Language: ru\n"
@@ -74,7 +74,7 @@ msgstr "агрегация со сторонних сайтов (без внеш
 msgid "Display"
 msgstr "Отображение"
 
-#: includes/admin.php:187 includes/networks.php:55
+#: includes/admin.php:187 includes/networks.php:56
 msgid "Blogosphere"
 msgstr "Блогосфера"
 
@@ -111,6 +111,31 @@ msgid ""
 msgstr ""
 "Применяется как к хештегам, так и к упоминаниям без включённых ссылок на "
 "социальные сети."
+
+#: includes/admin.php:208
+msgid "Uninstall"
+msgstr "Удаление"
+
+#: includes/admin.php:211
+msgid "Delete data on uninstall"
+msgstr "Очистка данных при удалении"
+
+#: includes/admin.php:215
+msgid ""
+"Delete mention handles and their links to local users when the plugin is "
+"deleted."
+msgstr ""
+"Удалять имена пользователей в социальных сетях, указанные для упоминаний, и "
+"связи упоминаний с локальными пользователями при удалении плагина."
+
+#: includes/admin.php:218
+msgid ""
+"When off, they are kept if you reinstall. Hashtag and mention terms are kept "
+"either way, and other settings are always removed."
+msgstr ""
+"Когда отключено, они сохраняются при переустановке. Термины хештегов и "
+"упоминаний сохраняются в любом случае, а остальные настройки удаляются "
+"всегда."
 
 #: includes/blogosphere.php:219 includes/blogosphere.php:220
 msgid "From around the blogosphere"

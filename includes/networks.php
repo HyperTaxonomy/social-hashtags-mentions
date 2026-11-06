@@ -7,8 +7,9 @@
  * TermConnect as `social_{slug}` link types (see link-types.php) and offered in
  * the block editor in the admin-defined order (see settings.php).
  *
- * The special `blogosphere` pseudo-network is hashtag-only and has no external
- * URL — it aggregates peer-site posts via TermConnect (see blogosphere.php).
+ * The special `blogosphere` pseudo-network has no external URL. On hashtags it
+ * aggregates peer-site posts via TermConnect (see blogosphere.php); on mentions it
+ * turns the person's local and peer author profiles on or off.
  *
  * @package SocialHashtagsMentions
  * @since 1.0.0

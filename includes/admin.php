@@ -103,7 +103,7 @@ function sh_admin_handle_save(): void {
     $auto    = isset( $_POST['sh_blogosphere_auto_append'] );
     $no_link = isset( $_POST['sh_hashtag_no_link'] ) ? sanitize_key( wp_unslash( $_POST['sh_hashtag_no_link'] ) ) : 'archive';
 
-    sh_save_settings( $networks, $auto, $no_link );
+    sh_save_settings( $networks, $auto, $no_link, isset( $_POST['sh_delete_on_uninstall'] ) );
 
     wp_safe_redirect( add_query_arg(
         array( 'page' => 'social-hashtags-mentions', 'sh-saved' => '1' ),
@@ -201,6 +201,22 @@ function sh_admin_render(): void {
                         <label><input type="radio" name="sh_hashtag_no_link" value="archive" <?php checked( 'archive', $no_link ); ?> /> <?php esc_html_e( 'Link to the local archive', 'social-hashtags-mentions' ); ?></label><br />
                         <label><input type="radio" name="sh_hashtag_no_link" value="plain" <?php checked( 'plain', $no_link ); ?> /> <?php esc_html_e( 'Render as plain text (no link)', 'social-hashtags-mentions' ); ?></label>
                         <p class="description"><?php esc_html_e( 'Applies to both hashtags and mentions whose networks resolve to no links.', 'social-hashtags-mentions' ); ?></p>
+                    </td>
+                </tr>
+            </table>
+
+            <h2><?php esc_html_e( 'Uninstall', 'social-hashtags-mentions' ); ?></h2>
+            <table class="form-table" role="presentation">
+                <tr>
+                    <th scope="row"><?php esc_html_e( 'Delete data on uninstall', 'social-hashtags-mentions' ); ?></th>
+                    <td>
+                        <label>
+                            <input type="checkbox" name="sh_delete_on_uninstall" value="1" <?php checked( ! empty( sh_get_settings()['delete_on_uninstall'] ) ); ?> />
+                            <?php esc_html_e( 'Delete mention handles and their links to local users when the plugin is deleted.', 'social-hashtags-mentions' ); ?>
+                        </label>
+                        <p class="description">
+                            <?php esc_html_e( 'When off, they are kept if you reinstall. Hashtag and mention terms are kept either way, and other settings are always removed.', 'social-hashtags-mentions' ); ?>
+                        </p>
                     </td>
                 </tr>
             </table>

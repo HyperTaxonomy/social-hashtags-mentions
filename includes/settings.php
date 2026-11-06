@@ -59,6 +59,7 @@ function sh_get_settings(): array {
         'networks'                => $normalized,
         'blogosphere_auto_append' => ! isset( $stored['blogosphere_auto_append'] ) || ! empty( $stored['blogosphere_auto_append'] ),
         'hashtag_no_link'         => $no_link,
+        'delete_on_uninstall'     => ! empty( $stored['delete_on_uninstall'] ),
     );
     return $cache[ $blog_id ];
 }
@@ -136,9 +137,10 @@ function sh_is_network_enabled( string $slug ): bool {
  * @param array<string,bool> $networks    Ordered map ( slug => enabled ).
  * @param bool               $auto_append Whether to auto-append the Blogosphere section.
  * @param string             $no_link     'archive' or 'plain'.
+ * @param bool               $delete_on_uninstall Whether uninstalling removes mention handles.
  * @return bool
  */
-function sh_save_settings( array $networks, bool $auto_append, string $no_link ): bool {
+function sh_save_settings( array $networks, bool $auto_append, string $no_link, bool $delete_on_uninstall ): bool {
     $registry = sh_get_network_registry();
     $clean    = array();
     foreach ( $networks as $slug => $enabled ) {
@@ -152,6 +154,7 @@ function sh_save_settings( array $networks, bool $auto_append, string $no_link )
             'networks'                => $clean,
             'blogosphere_auto_append' => $auto_append,
             'hashtag_no_link'         => 'plain' === $no_link ? 'plain' : 'archive',
+            'delete_on_uninstall'     => $delete_on_uninstall,
         )
     );
 }

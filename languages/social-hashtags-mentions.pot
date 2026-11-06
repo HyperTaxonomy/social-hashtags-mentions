@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-30 08:35-0400\n"
+"POT-Creation-Date: 2026-11-06 03:27-0500\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -68,7 +68,7 @@ msgstr ""
 msgid "Display"
 msgstr ""
 
-#: includes/admin.php:187 includes/networks.php:55
+#: includes/admin.php:187 includes/networks.php:56
 msgid "Blogosphere"
 msgstr ""
 
@@ -98,6 +98,26 @@ msgstr ""
 #: includes/admin.php:203
 msgid ""
 "Applies to both hashtags and mentions whose networks resolve to no links."
+msgstr ""
+
+#: includes/admin.php:208
+msgid "Uninstall"
+msgstr ""
+
+#: includes/admin.php:211
+msgid "Delete data on uninstall"
+msgstr ""
+
+#: includes/admin.php:215
+msgid ""
+"Delete mention handles and their links to local users when the plugin is "
+"deleted."
+msgstr ""
+
+#: includes/admin.php:218
+msgid ""
+"When off, they are kept if you reinstall. Hashtag and mention terms are kept "
+"either way, and other settings are always removed."
 msgstr ""
 
 #: includes/blogosphere.php:219 includes/blogosphere.php:220

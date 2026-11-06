@@ -2,11 +2,12 @@
 /**
  * Uninstall cleanup for Social Hashtags & Mentions.
  *
- * Removes the plugin's settings option, its cached blogosphere pools (sh_bg_pool_*
- * transients) and the per-network handle meta it stored on terms (_tc_link_social_*).
- * On multisite every site is cleaned. The hashtag/mention terms themselves are left in
- * place — they are content, and removing the plugin should not delete a site's
- * taxonomy data. The filter-registered TermConnect link types disappear on their
+ * Removes the plugin's settings option and its cached blogosphere pools (sh_bg_pool_*
+ * transients). When "Delete data on uninstall" is on, also removes mention handles
+ * (_tc_link_social_*), local author links (_tc_link_local_site) and user links
+ * (_sh_user_id). On multisite every site is cleaned. The hashtag/mention terms
+ * themselves are always left in place — they are content, and removing the plugin
+ * should not delete a site's taxonomy data. The filter-registered TermConnect link types disappear on their
  * own once this plugin is inactive (they are never persisted).
  *
  * @package SocialHashtagsMentions
@@ -23,6 +24,8 @@ if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 function sh_uninstall_cleanup(): void {
     global $wpdb;
 
+    $settings = get_option( 'sh_settings', array() );
+
     delete_option( 'sh_settings' );
 
     // Cached "around the blogosphere" pools.
@@ -32,13 +35,18 @@ function sh_uninstall_cleanup(): void {
             OR option_name LIKE '\_transient\_timeout\_sh\_bg\_%'"
     );
 
-    // Remove _tc_link_social_* handle meta written for mention terms.
+    // Handles and user links are kept unless the admin opted in.
+    if ( empty( $settings['delete_on_uninstall'] ) ) {
+        return;
+    }
+
+    // Remove handle and local author meta written for mention terms.
     $rows = $wpdb->get_col(
-        "SELECT term_id FROM {$wpdb->termmeta} WHERE meta_key LIKE '\_tc\_link\_social\_%'"
+        "SELECT term_id FROM {$wpdb->termmeta} WHERE meta_key LIKE '\_tc\_link\_social\_%' OR meta_key = '_tc_link_local_site'"
     );
 
     $wpdb->query(
-        "DELETE FROM {$wpdb->termmeta} WHERE meta_key LIKE '\_tc\_link\_social\_%'"
+        "DELETE FROM {$wpdb->termmeta} WHERE meta_key LIKE '\_tc\_link\_social\_%' OR meta_key IN ( '_tc_link_local_site', '_sh_user_id' )"
     );
 
     // Refresh TermConnect's URI index/cache for affected terms when TC is present.
