@@ -86,7 +86,7 @@ On a hashtag archive it defaults to the current hashtag. Elsewhere, name one:
 
 The section paginates independently of the page's own pagination.
 
-## Federation
+## Cross-site matching
 
 Because Social Hashtags & Mentions is built on TermConnect, hashtags and mentions can work across peer sites that also run this plugin and TermConnect. Hashtags are matched by slug. Mentions are matched by their shared network handle (the resulting profile URI), so the same person is recognized even when the term slug or label differs from site to site.
 

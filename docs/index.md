@@ -16,7 +16,7 @@ Part of the [HyperTaxonomy Suite](https://hypertaxonomy.org) of interoperable Wo
 - **Smart links at render time** — one enabled network links straight to it; several open a small pane of choices; none links to the local archive (or renders as plain text). A mention with a single profile renders inline as the network icon + handle.
 - **Network ordering** — enable and drag-to-order networks in *Settings → Social Hashtags & Mentions*. The order drives the editor and the front end; disabling a network removes its links everywhere at once.
 - **Blogosphere** — a built-in option that aggregates post summaries sharing a hashtag across your WordPress peer sites (via TermConnect) onto the hashtag archive, each linking out to the peer. On mentions, it turns a person's WordPress author profiles on or off.
-- **Federation** — because handles are stored as TermConnect identifiers, mentions match across peer sites running this plugin by their shared profile URI, even when term slugs and labels differ.
+- **Cross-site matching** — because handles are stored as TermConnect identifiers, mentions match across peer sites running this plugin by their shared profile URI, even when term slugs and labels differ.
 
 ## Documentation map
 

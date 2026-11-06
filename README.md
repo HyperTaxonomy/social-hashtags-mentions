@@ -10,7 +10,7 @@ Inline `#hashtags` and `@mentions` as taxonomy terms, with per-instance links to
 - **Mention profiles** — per-network handles are stored on the mention term and reused; a mention renders as a direct icon + handle link (one profile) or a pane of profiles (several).
 - **Drag-to-order networks** in *Settings → Social Hashtags & Mentions*; the order drives the editor and the front end. Toggling a network updates every post at once.
 - **Blogosphere** — aggregates hashtag post summaries from your WordPress peers (via TermConnect) onto the hashtag archive, each linking out to the peer. On mentions, it turns a person's WordPress author profiles on or off.
-- **Federation** — mentions match across peer sites running this plugin by shared network handle (profile URI), even when slugs and labels differ.
+- **Cross-site matching** — mentions match across peer sites running this plugin by shared network handle (profile URI), even when slugs and labels differ.
 
 ## Requirements
 
