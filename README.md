@@ -1,6 +1,6 @@
 # Social Hashtags & Mentions
 
-Inline `#hashtags` and `@mentions` as taxonomy terms, with per-instance links to the social networks you enable. Part of the [HyperTaxonomy](https://hypertaxonomy.org) suite; built on [TermConnect](https://hypertaxonomy.org/termconnect/).
+Inline `#hashtags` and `@mentions` as taxonomy terms, with per-instance links to the social networks you enable. Part of the [HyperTaxonomy Suite](https://hypertaxonomy.org); built on [TermConnect](https://hypertaxonomy.org/termconnect/).
 
 ## What it does
 
