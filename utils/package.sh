@@ -81,6 +81,7 @@ rules += [
     ('.distignore', False, False),
     ('.gitignore', False, False),
     ('.wordpress-org', True, False),
+    ('docs', True, True),
 ]
 
 count = 0
