@@ -78,7 +78,7 @@ Enable the **Blogosphere** network in settings to turn it on. With **auto-append
 [social_blogosphere]
 ```
 
-On a hashtag archive it defaults to the current hashtag. Elsewhere, name one:
+On a hashtag archive it defaults to the current hashtag. Elsewhere, name one. `per_page` defaults to 10:
 
 ```
 [social_blogosphere hashtag="example" per_page="10"]

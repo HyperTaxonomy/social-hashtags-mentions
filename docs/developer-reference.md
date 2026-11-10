@@ -72,10 +72,6 @@ Mention handles are *set* on the term's edit screen through TermConnect's Extern
 
 `delete_on_uninstall` in the `sh_settings` option (the **Delete data on uninstall** setting) decides whether uninstalling also removes `_tc_link_social_*`, `_tc_link_local_site` and `_sh_user_id` term meta. Hashtag and mention terms are always kept.
 
-## Shortcode
-
-`[social_blogosphere hashtag="" per_page="10"]` — renders the aggregated peer-post summaries for a hashtag (defaults to the current hashtag archive term).
-
 ## TermConnect integration
 
 Social Hashtags & Mentions is a TermConnect companion and relies on these TermConnect extension points (see the [TermConnect developer reference](https://hypertaxonomy.org/termconnect/developer-reference/)):

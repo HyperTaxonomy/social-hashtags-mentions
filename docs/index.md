@@ -14,12 +14,12 @@ Part of the [HyperTaxonomy Suite](https://hypertaxonomy.org) of interoperable Wo
 
 ## How it works
 
-- **Two flat taxonomies** — `hashtag` (primary) and `mention` (secondary). A post's terms are reconciled from its inline tokens on every save; there is no taxonomy meta box.
-- **Inline tokens** — type `#` or `@` in any rich-text field to autocomplete existing terms and local users. A small panel on each token picks which networks it links to (hashtags) or which of the person's configured profiles to show (mentions); mention handles are set once on the term's edit screen.
-- **Smart links at render time** — one enabled network links straight to it; several open a small pane of choices; none links to the local archive (or renders as plain text). A mention with a single profile renders inline as the network icon + handle.
-- **Network ordering** — enable and drag-to-order networks in *Settings → Social Hashtags & Mentions*. The order drives the editor and the front end; disabling a network removes its links everywhere at once.
-- **Blogosphere** — a built-in option that aggregates post summaries sharing a hashtag across your WordPress peer sites (via TermConnect) onto the hashtag archive, each linking out to the peer. On mentions, it turns a person's WordPress author profiles on or off.
-- **Cross-site matching** — because handles are stored as TermConnect identifiers, mentions match across peer sites running this plugin by their shared profile URI, even when term slugs and labels differ.
+- **Inline tokens become terms** — type `#` or `@` in the editor; on save, each post's `hashtag` and `mention` terms are updated to match its tokens.
+- **Links chosen per token** — each token links to the networks you enable, in the order you set, and the front end renders the links at display time.
+- **Blogosphere** — hashtag archives can show matching posts from your WordPress peer sites, through TermConnect.
+- **Cross-site matching** — mentions match across peer sites running this plugin by the person's profile URI.
+
+[Usage](usage.html) covers each of these in full.
 
 ## Documentation map
 
@@ -36,11 +36,12 @@ Part of the [HyperTaxonomy Suite](https://hypertaxonomy.org) of interoperable Wo
 | HyperTaxonomy | optional (relevance search, relationships) |
 | WP-SKOS | optional (SKOS concept output) |
 
-## Installation
+## Getting started
 
 1. Install and activate **[TermConnect](https://hypertaxonomy.org/termconnect/)**.
 2. Install from the [WordPress.org plugin directory](https://wordpress.org/plugins/social-hashtags-mentions/), or download the zip from [GitHub Releases](https://github.com/HyperTaxonomy/social-hashtags-mentions/releases) and upload via **Plugins → Add New → Upload Plugin**.
 3. Activate, then go to **Settings → Social Hashtags & Mentions** to enable and order the networks you want.
+4. In a post, type `#` followed by a word and pick or create the hashtag. Save, and the post gets that hashtag term; view the post to see the token's links.
 
 ## License
 
