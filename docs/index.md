@@ -25,6 +25,7 @@ Part of the [HyperTaxonomy Suite](https://hypertaxonomy.org) of interoperable Wo
 
 - **[Usage](usage.html)** — the user-facing guide: settings and network ordering, the inline editor tokens, hashtag vs. mention rendering, mention handles, and the Blogosphere section and `[social_blogosphere]` shortcode.
 - **[Developer Reference](developer-reference.html)** — the network registry filter, REST endpoints, the TermConnect integration (link types, `tc_link_uri`, `tc_enabled_taxonomies`, peer author search), and how token markup maps to taxonomy terms.
+- **[Architecture](architecture/)** — for contributors: file structure and loading, function and hook references, and the database schema.
 
 ## Requirements
 
