@@ -13,4 +13,4 @@ The Function Reference and Hook Reference are generated from the code and its do
 - **[File Structure & Loading](file-structure.html)** — the directory layout and the order files load in.
 - **[Function Reference](function-reference.html)** — every function and public method, by file.
 - **[Hook Reference](hook-reference.html)** — the callbacks Social Hashtags & Mentions registers, and the hooks it fires.
-- **[Database Schema](database-schema.html)** — its taxonomies, term meta, options and transients.
+- **[Data Storage](data-storage.html)** — its taxonomies, term meta, options and transients.

@@ -1,10 +1,10 @@
 ---
-title: Database Schema
+title: Data Storage
 parent: Architecture
 nav_order: 4
 ---
 
-# Database Schema
+# Data Storage
 
 Social Hashtags & Mentions has no tables. It stores its terms in two taxonomies, mention links through TermConnect, and its settings and caches in an option and transients. For what uninstalling removes, see [Usage](../usage.html#uninstalling).
 

@@ -32,7 +32,7 @@ Full documentation is published at [hypertaxonomy.org/social-hashtags-mentions](
 
 - **[Usage](docs/usage.md)** — settings and network ordering, the inline editor tokens, hashtag vs. mention rendering, mention handles, and the Blogosphere section and `[social_blogosphere]` shortcode.
 - **[Developer Reference](docs/developer-reference.md)** — the network registry filter, REST endpoints, the TermConnect integration (link types, `tc_link_uri`, `tc_enabled_taxonomies`, peer author search), and how token markup maps to taxonomy terms.
-- **[Architecture](docs/architecture/index.md)** — file structure and loading, function and hook references, and the database schema. Coding standards for the whole suite are in HyperTaxonomy's [Contributing guide](https://hypertaxonomy.org/hypertaxonomy/architecture/contributing.html).
+- **[Architecture](docs/architecture/index.md)** — file structure and loading, function and hook references, and data storage. Coding standards for the whole suite are in HyperTaxonomy's [Contributing guide](https://hypertaxonomy.org/hypertaxonomy/architecture/contributing.html).
 
 ## Translations
 
