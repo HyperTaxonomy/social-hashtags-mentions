@@ -6,7 +6,7 @@ nav_order: 4
 
 # Data Storage
 
-Social Hashtags & Mentions has no tables. It stores its terms in two taxonomies, mention links through TermConnect, and its settings and caches in an option and transients. For what uninstalling removes, see [Usage](../usage.html#uninstalling).
+Social Hashtags & Mentions has no tables. It stores its terms in two taxonomies, mention links through TermConnect, and its settings and caches in an option and transients. For what uninstalling removes, see [User Guide → Uninstalling](../user-guide.html#uninstalling).
 
 ## Taxonomies
 

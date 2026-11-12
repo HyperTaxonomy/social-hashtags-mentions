@@ -19,11 +19,11 @@ Part of the [HyperTaxonomy Suite](https://hypertaxonomy.org) of interoperable Wo
 - **Blogosphere** — hashtag archives can show matching posts from your WordPress peer sites, through TermConnect.
 - **Cross-site matching** — mentions match across peer sites running this plugin by the person's profile URI.
 
-[Usage](usage.html) covers each of these in full.
+The [User Guide](user-guide.html) covers each of these in full.
 
 ## Documentation map
 
-- **[Usage](usage.html)** — the user-facing guide: settings and network ordering, the inline editor tokens, hashtag vs. mention rendering, mention handles, and the Blogosphere section and `[social_blogosphere]` shortcode.
+- **[User Guide](user-guide.html)** — for site owners: settings and network ordering, the inline editor tokens, hashtag vs. mention rendering, mention handles, and the Blogosphere section and `[social_blogosphere]` shortcode.
 - **[Developer Reference](developer-reference.html)** — the network registry filter, REST endpoints, the TermConnect integration (link types, `tc_link_uri`, `tc_enabled_taxonomies`, peer author search), and how token markup maps to taxonomy terms.
 - **[Architecture](architecture/)** — for contributors: file structure and loading, function and hook references, and data storage.
 

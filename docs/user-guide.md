@@ -1,9 +1,9 @@
 ---
-title: Usage
+title: User Guide
 nav_order: 2
 ---
 
-# Usage
+# User Guide
 
 ## Enabling and ordering networks
 
