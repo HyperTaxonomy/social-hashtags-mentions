@@ -70,7 +70,7 @@ Mention handles are *set* on the term's edit screen through TermConnect's Extern
 
 ## Uninstall
 
-`delete_on_uninstall` in the `sh_settings` option (the **Delete data on uninstall** setting) decides whether uninstalling also removes `_tc_link_social_*`, `_tc_link_local_site` and `_sh_user_id` term meta. Hashtag and mention terms are always kept.
+`delete_on_uninstall` in the `sh_settings` option (see [Data Storage](architecture/data-storage.html#option)) (the **Delete data on uninstall** setting) decides whether uninstalling also removes `_tc_link_social_*`, `_tc_link_local_site` and `_sh_user_id` term meta. Hashtag and mention terms are always kept.
 
 ## TermConnect integration
 
