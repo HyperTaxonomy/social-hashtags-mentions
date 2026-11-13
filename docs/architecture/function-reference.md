@@ -19,7 +19,7 @@ Social Hashtags & Mentions's functions and public and protected methods, by file
 
 ## Plugin root
 
-### `social-hashtags-mentions.php`
+### Main plugin file (`social-hashtags-mentions.php`)
 
 Main plugin file.
 
@@ -27,7 +27,7 @@ Main plugin file.
 - `sh_deactivate()` — Deactivation: drop the stored rewrite rules so the taxonomy archive routes are removed.
 - `sh_termconnect_active()` — Whether TermConnect is active.
 
-### `uninstall.php`
+### Uninstall (`uninstall.php`)
 
 Uninstall cleanup for Social Hashtags & Mentions.
 
@@ -35,7 +35,7 @@ Uninstall cleanup for Social Hashtags & Mentions.
 
 ## Includes
 
-### `includes/admin.php`
+### Settings page (`includes/admin.php`)
 
 Admin settings page: Settings → Social Hashtags & Mentions.
 
@@ -45,7 +45,7 @@ Admin settings page: Settings → Social Hashtags & Mentions.
 - `sh_admin_handle_save()` — Handles the settings form submission.
 - `sh_admin_render()` — Renders the settings page.
 
-### `includes/blogosphere.php`
+### Blogosphere section (`includes/blogosphere.php`)
 
 Blogosphere: aggregated peer-post summaries for a hashtag.
 
@@ -57,14 +57,14 @@ Blogosphere: aggregated peer-post summaries for a hashtag.
 - `sh_blogosphere_shortcode( $atts )` — Shortcode handler for [social_blogosphere].
 - `sh_blogosphere_auto_append( $query )` — Auto-appends the Blogosphere section after the main loop on a hashtag archive.
 
-### `includes/editor.php`
+### Block editor (`includes/editor.php`)
 
 Block editor integration: enqueues the inline-token script and localizes the data it needs (REST root + nonce, ordered enabled networks).
 
 - `sh_enqueue_editor_assets()` — Enqueues and localizes the editor script for supported post types.
 - `sh_editor_networks()` — Returns the ordered enabled networks for the editor.
 
-### `includes/link-types.php`
+### TermConnect link types (`includes/link-types.php`)
 
 TermConnect link-type integration.
 
@@ -76,7 +76,7 @@ TermConnect link-type integration.
 - `sh_suggest_config( $config, string $slug, $type = null, string $taxonomy = '' )` — Provides a profile-search suggest endpoint for networks that expose a public, credential-free typeahead API.
 - `sh_parse_suggest_response( array $results, string $body, string $parser )` — Parses suggest responses for this plugin's network parsers into the { value, label } shape TermConnect's autocomplete expects. The stored value is the network handle; the label adds the display name when one is available.
 
-### `includes/networks.php`
+### Network registry (`includes/networks.php`)
 
 Social network registry.
 
@@ -89,7 +89,7 @@ Social network registry.
 - `sh_network_color( string $slug )` — The official brand color for a network, used to tint its icon in the editor and the front-end panel (admin screens stay monochrome). Returns '' when none.
 - `sh_build_network_url( string $slug, string $id, string $taxonomy )` — Builds the external URL for a network + identifier on a given taxonomy.
 
-### `includes/render.php`
+### Token rendering (`includes/render.php`)
 
 Frontend rendering of inline tokens.
 
@@ -111,7 +111,7 @@ Frontend rendering of inline tokens.
 - `sh_set_text_attr( string $attrs, string $name, string $value )` — Sets or replaces a plain (non-URL) attribute within an attribute string.
 - `sh_add_class( string $attrs, string $class )` — Adds a class to the class attribute within an attribute string.
 
-### `includes/rest.php`
+### REST API (`includes/rest.php`)
 
 REST endpoints used by the block editor.
 
@@ -124,7 +124,7 @@ REST endpoints used by the block editor.
 - `sh_collect_handles( int $term_id )` — Returns the selectable items for a mention's editor popover: each enabled social network (with the term's stored handle, if any) and — when the Blogosphere network is enabled — each WordPress author profile on the term (the "Local site" and any peers), with the author nicename as its handle.
 - `sh_rest_get_handles( WP_REST_Request $request )` — GET /handles — read a mention term's per-network handles.
 
-### `includes/settings.php`
+### Settings storage (`includes/settings.php`)
 
 Settings storage.
 
@@ -136,14 +136,14 @@ Settings storage.
 - `sh_is_network_enabled( string $slug )` — Whether a network is enabled.
 - `sh_save_settings( array $networks, bool $auto_append, string $no_link, bool $delete_on_uninstall )` — Persists the full settings: ordered network map plus display options.
 
-### `includes/taxonomies.php`
+### Taxonomies (`includes/taxonomies.php`)
 
 Taxonomy registration: hashtag (primary) and mention (secondary).
 
 - `sh_token_post_types()` — Post types that may contain inline hashtags/mentions.
 - `sh_register_taxonomies()` — Registers the hashtag and mention taxonomies.
 
-### `includes/term-columns.php`
+### Term list columns (`includes/term-columns.php`)
 
 Term list-table columns for the hashtag and mention taxonomies.
 
@@ -154,7 +154,7 @@ Term list-table columns for the hashtag and mention taxonomies.
 - `sh_render_networks_cell( int $term_id )` — Networks cell: click-through icons to each enabled network's hashtag page.
 - `sh_term_column_css()` — Inline styles for the columns (the front-end stylesheet isn't loaded here).
 
-### `includes/term-sync.php`
+### Automatic term assignment (`includes/term-sync.php`)
 
 Automatic term assignment from inline tokens.
 
