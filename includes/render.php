@@ -138,11 +138,7 @@ function sh_render_hashtag_token( string $attrs, string $inner, WP_Term $term, a
 
     // No enabled links: link to the archive or render as plain text, per setting.
     if ( empty( $targets ) ) {
-        if ( 'plain' === sh_no_link_mode() || '' === $archive ) {
-            return '<span class="sh-token sh-hashtag sh-token--plain">' . $inner . '</span>';
-        }
-        $attrs = sh_set_attr( $attrs, 'href', $archive );
-        return '<a' . $attrs . '>' . $inner . '</a>';
+        return sh_render_untargeted_token( $attrs, $inner, $archive, 'hashtag' );
     }
 
     // Exactly one target: the token links directly to it.
@@ -150,34 +146,13 @@ function sh_render_hashtag_token( string $attrs, string $inner, WP_Term $term, a
         $t     = $targets[0];
         $attrs = sh_set_attr( $attrs, 'href', $t['url'] );
         if ( $t['external'] ) {
-            $attrs = sh_set_text_attr( $attrs, 'rel', 'nofollow external noopener' );
-            $attrs = sh_set_text_attr( $attrs, 'target', '_blank' );
+            $attrs = sh_external_link_attrs( $attrs );
         }
         return '<a' . $attrs . '>' . $inner . '</a>';
     }
 
     // Multiple targets: the token opens a pane listing them.
-    $attrs = sh_set_attr( $attrs, 'href', '' !== $archive ? $archive : $targets[0]['url'] );
-    $attrs = sh_add_class( $attrs, 'sh-token--multi' );
-    $attrs = sh_set_text_attr( $attrs, 'role', 'button' );
-    $attrs = sh_set_text_attr( $attrs, 'aria-haspopup', 'true' );
-    $attrs = sh_set_text_attr( $attrs, 'aria-expanded', 'false' );
-
-    $links = array();
-    foreach ( $targets as $t ) {
-        $rel     = $t['external'] ? ' rel="nofollow external noopener" target="_blank"' : '';
-        $links[] = sprintf(
-            '<a class="sh-pane__link sh-pane__link--%1$s" href="%2$s"%3$s>%4$s %5$s</a>',
-            esc_attr( $t['slug'] ),
-            esc_url( $t['url'] ),
-            $rel,
-            sh_network_icon_html( $t['slug'], $t['icon'], sh_network_color( $t['slug'] ) ),
-            esc_html( $t['label'] )
-        );
-    }
-    $pane = '<span class="sh-pane" hidden><span class="sh-pane__inner">' . implode( '', $links ) . '</span></span>';
-
-    return '<span class="sh-token-wrap">' . '<a' . $attrs . '>' . $inner . '</a>' . $pane . '</span>';
+    return sh_render_multi_target_token( $attrs, $inner, $targets, $archive, static fn( array $t ): string => esc_html( $t['label'] ) );
 }
 
 /**
@@ -405,11 +380,7 @@ function sh_render_mention_token( string $attrs, string $inner, WP_Term $term, a
     // No enabled links: link to the local archive (the local profile) or render
     // as plain text, per the setting.
     if ( empty( $targets ) ) {
-        if ( 'plain' === sh_no_link_mode() || '' === $archive ) {
-            return '<span class="sh-token sh-mention sh-token--plain">' . $inner . '</span>';
-        }
-        $attrs = sh_set_attr( $attrs, 'href', $archive );
-        return '<a' . $attrs . '>' . $inner . '</a>';
+        return sh_render_untargeted_token( $attrs, $inner, $archive, 'mention' );
     }
 
     // Exactly one target.
@@ -423,8 +394,7 @@ function sh_render_mention_token( string $attrs, string $inner, WP_Term $term, a
         }
 
         // An external profile renders inline as the network icon + handle.
-        $attrs = sh_set_text_attr( $attrs, 'rel', 'nofollow external noopener' );
-        $attrs = sh_set_text_attr( $attrs, 'target', '_blank' );
+        $attrs = sh_external_link_attrs( $attrs );
         $attrs = sh_add_class( $attrs, 'sh-mention--inline' );
         $label = sh_network_icon_html( $t['slug'], $t['icon'], sh_network_color( $t['slug'] ) )
             . sh_mention_label_html( $t );
@@ -432,27 +402,7 @@ function sh_render_mention_token( string $attrs, string $inner, WP_Term $term, a
     }
 
     // Multiple targets: the @name opens a pane listing each icon + handle.
-    $attrs = sh_set_attr( $attrs, 'href', '' !== $archive ? $archive : $targets[0]['url'] );
-    $attrs = sh_add_class( $attrs, 'sh-token--multi' );
-    $attrs = sh_set_text_attr( $attrs, 'role', 'button' );
-    $attrs = sh_set_text_attr( $attrs, 'aria-haspopup', 'true' );
-    $attrs = sh_set_text_attr( $attrs, 'aria-expanded', 'false' );
-
-    $links = array();
-    foreach ( $targets as $t ) {
-        $rel     = $t['external'] ? ' rel="nofollow external noopener" target="_blank"' : '';
-        $links[] = sprintf(
-            '<a class="sh-pane__link sh-pane__link--%1$s" href="%2$s"%3$s>%4$s %5$s</a>',
-            esc_attr( $t['slug'] ),
-            esc_url( $t['url'] ),
-            $rel,
-            sh_network_icon_html( $t['slug'], $t['icon'], sh_network_color( $t['slug'] ) ),
-            sh_mention_label_html( $t )
-        );
-    }
-    $pane = '<span class="sh-pane" hidden><span class="sh-pane__inner">' . implode( '', $links ) . '</span></span>';
-
-    return '<span class="sh-token-wrap"><a' . $attrs . '>' . $inner . '</a>' . $pane . '</span>';
+    return sh_render_multi_target_token( $attrs, $inner, $targets, $archive, 'sh_mention_label_html' );
 }
 
 /**
@@ -633,4 +583,74 @@ function sh_add_class( string $attrs, string $class ): string {
         return (string) preg_replace( '/(?<=^|\s)class=("|\').*?\1/i', 'class="' . esc_attr( $classes ) . '"', $attrs, 1 );
     }
     return rtrim( $attrs ) . ' class="' . esc_attr( $class ) . '"';
+}
+
+/**
+ * Render a token that has no enabled link targets.
+ *
+ * Links to the local archive, or renders plain text when the no-link setting is
+ * "plain" or there is no archive.
+ *
+ * @since 1.0.0
+ * @param string $attrs   The token anchor's attribute string.
+ * @param string $inner   The token's inner HTML.
+ * @param string $archive Local archive URL, or ''.
+ * @param string $kind    'hashtag' or 'mention'.
+ * @return string
+ */
+function sh_render_untargeted_token( string $attrs, string $inner, string $archive, string $kind ): string {
+    if ( 'plain' === sh_no_link_mode() || '' === $archive ) {
+        return '<span class="sh-token sh-' . $kind . ' sh-token--plain">' . $inner . '</span>';
+    }
+    return '<a' . sh_set_attr( $attrs, 'href', $archive ) . '>' . $inner . '</a>';
+}
+
+/**
+ * Mark a token anchor as an external link that opens in a new tab.
+ *
+ * @since 1.0.0
+ * @param string $attrs Attribute string.
+ * @return string
+ */
+function sh_external_link_attrs( string $attrs ): string {
+    $attrs = sh_set_text_attr( $attrs, 'rel', 'nofollow external noopener' );
+    return sh_set_text_attr( $attrs, 'target', '_blank' );
+}
+
+/**
+ * Render a token with several link targets: the token opens a pane listing them.
+ *
+ * Without JavaScript the token still links to the local archive, or to the first
+ * target when there is no archive.
+ *
+ * @since 1.0.0
+ * @param string   $attrs   The token anchor's attribute string.
+ * @param string   $inner   The token's inner HTML.
+ * @param array[]  $targets Link targets: { slug, url, icon, external, ... }.
+ * @param string   $archive Local archive URL, or ''.
+ * @param callable $label   Returns a target's label HTML, escaped.
+ * @return string
+ */
+function sh_render_multi_target_token( string $attrs, string $inner, array $targets, string $archive, callable $label ): string {
+    $attrs = sh_set_attr( $attrs, 'href', '' !== $archive ? $archive : $targets[0]['url'] );
+    $attrs = sh_add_class( $attrs, 'sh-token--multi' );
+    $attrs = sh_set_text_attr( $attrs, 'role', 'button' );
+    $attrs = sh_set_text_attr( $attrs, 'aria-haspopup', 'true' );
+    $attrs = sh_set_text_attr( $attrs, 'aria-expanded', 'false' );
+
+    $links = array();
+    foreach ( $targets as $t ) {
+        $rel     = $t['external'] ? ' rel="nofollow external noopener" target="_blank"' : '';
+        $links[] = sprintf(
+            '<a class="sh-pane__link sh-pane__link--%1$s" href="%2$s"%3$s>%4$s %5$s</a>',
+            esc_attr( $t['slug'] ),
+            esc_url( $t['url'] ),
+            $rel,
+            sh_network_icon_html( $t['slug'], $t['icon'], sh_network_color( $t['slug'] ) ),
+            $label( $t )
+        );
+    }
+    $pane = '<span class="sh-pane" hidden><span class="sh-pane__inner">' . implode( '', $links ) . '</span></span>';
+
+    return '<span class="sh-token-wrap"><a' . $attrs . '>' . $inner . '</a>' . $pane . '</span>';
 }
