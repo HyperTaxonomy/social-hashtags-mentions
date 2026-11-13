@@ -67,6 +67,8 @@ A mention's identifiers are configured once, on the **mention term's edit screen
 
 The **Posts → Hashtags** and **Posts → Mentions** lists have **Networks** and **Profiles** columns showing what each term links to.
 
+![The Mentions list with the Profiles column circled: each person's networks shown as icons](assets/images/screenshots/mentions-profiles.png)
+
 ## How tokens render on the front end
 
 The links are computed at display time from the per-token selection intersected with the networks currently enabled in settings.
