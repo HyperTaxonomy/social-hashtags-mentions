@@ -65,9 +65,9 @@ Settings and cached data are removed. Hashtag and mention terms are always kept.
 
 1. Settings → Social Hashtags & Mentions — enabling and drag-ordering networks, with the Blogosphere and display options
 2. Inserting a hashtag in the block editor — the # autocomplete listing existing terms
-3. Front end — a hashtag opening its multi-network pane, and a mention rendered as an icon + handle link
-4. A mention term's edit screen — the External Links panel where each network's handle is configured once and reused everywhere that person is mentioned
-5. The mention popover — choosing which of a person's configured profiles to show, anchored to the token
+3. The mention popover — choosing which of a person's configured profiles to show, anchored to the token
+4. Front end — a hashtag opening its multi-network pane, and a mention rendered as an icon + handle link
+5. A mention term's edit screen — the External Links panel where each network's handle is configured once and reused everywhere that person is mentioned
 6. The Blogosphere section on a hashtag archive — aggregated post summaries from peer sites
 
 == Changelog ==

@@ -7,6 +7,8 @@ nav_order: 2
 
 ## Enabling and ordering networks
 
+![The settings screen: networks with checkboxes and drag handles, and which token types each network supports](assets/images/screenshots/settings-networks.png)
+
 Go to **Settings → Social Hashtags & Mentions**. All networks start disabled, including Blogosphere, so until you enable one, tokens only link to the local archive. Each supported network has a row you can:
 
 - **Enable / disable** with its checkbox. Disabling a network removes its links from every post at once.
@@ -22,6 +24,8 @@ Two display options live on the same screen:
 The **Delete data on uninstall** option is at the bottom of the screen; see [Uninstalling](#uninstalling).
 
 ## Writing hashtags and mentions
+
+![Typing a hashtag in the block editor, with suggestions of existing hashtags and an option to create a new one](assets/images/screenshots/editor-autocomplete.png)
 
 In any rich-text field in the block editor, type `#` or `@`. This works in posts by default; developers can add other post types with the `sh_token_post_types` filter. An autocomplete list appears:
 
@@ -42,12 +46,16 @@ The button is unavailable when the selection is part of an ordinary link (remove
 
 ### Choosing networks for a token
 
+![A mention's popover in the editor, with a checkbox for each of the person's profiles](assets/images/screenshots/mention-popover.png)
+
 Place the caret inside a token and a small panel opens (or click the toolbar button):
 
 - **Hashtag** — tick the networks this particular hashtag should link to. (By default a token links to all enabled networks.)
 - **Mention** — tick which of this person's **configured profiles** to show for this instance. The panel lists only the networks where the term already has a handle; untick any you want to omit here.
 
 #### Setting a person's handles and profiles
+
+![A mention's edit screen with the person's handles on four networks in the External Links panel](assets/images/screenshots/mention-edit.png)
 
 A mention's identifiers are configured once, on the **mention term's edit screen** (**Posts → Mentions** → edit a term → *External links*), and reused everywhere that person is mentioned:
 
@@ -61,6 +69,8 @@ The **Posts → Hashtags** and **Posts → Mentions** lists have **Networks** an
 
 The links are computed at display time from the per-token selection intersected with the networks currently enabled in settings.
 
+![A post on the front end: a mention link and hashtags, with one hashtag's network pane open](assets/images/screenshots/front-end-tokens.png)
+
 - **Hashtag with one network** → the token links directly to that network's hashtag page. If that one is Blogosphere, it links to the local archive.
 - **Hashtag with several networks** → clicking the token opens a small pane listing each network, with Blogosphere linking to the local archive.
 - **Hashtag with no enabled networks** → links to the local archive, or plain text (per the setting).
@@ -71,6 +81,8 @@ The links are computed at display time from the per-token selection intersected 
 ## The Blogosphere section
 
 The built-in **Blogosphere** gathers post **summaries** sharing a hashtag from your configured WordPress peer sites (set up in TermConnect) and shows them on the hashtag archive. A peer only contributes if it also has a `hashtag` taxonomy, which means running this plugin too. Each summary links out to the peer's own post — nothing is copied locally. (The aggregated-summaries feature is hashtag-only; for **mentions**, enabling Blogosphere acts as the on/off gate for showing a person's WordPress author profiles across your peer sites.)
+
+![A hashtag archive with its own post, followed by a From around the blogosphere section listing posts from a peer site](assets/images/screenshots/blogosphere.png)
 
 Enable the **Blogosphere** network in settings to turn it on. With **auto-append** enabled it appears automatically on hashtag archives. For precise placement — especially in block themes — use the shortcode:
 
