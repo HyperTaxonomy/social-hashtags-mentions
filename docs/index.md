@@ -1,0 +1,60 @@
+---
+title: Home
+nav_order: 1
+---
+
+# TermConnect Social
+
+*Hashtags unleashed*
+{: .fs-6 .fw-300 }
+
+Write `#hashtags` and `@mentions` inline in the block editor and let them become real taxonomy terms — assigned to your posts automatically from the tokens in your content, with no taxonomy box to maintain. Each token links out to the social networks you choose: hashtags to a network's hashtag page, mentions to a person's profile. Enable and order networks once; the choice applies everywhere, and the front end renders the right links at display time.
+
+Part of the [HyperTaxonomy Suite](https://hypertaxonomy.org) of interoperable WordPress taxonomy plugins. Built on [TermConnect](https://hypertaxonomy.org/termconnect/), which it requires: TermConnect provides the link-type registry, identifier storage and cross-site matching, and the peer-fetch API this plugin builds on.
+
+## How it works
+
+- **Inline tokens become terms** — type `#` or `@` in the editor; on save, each post's `hashtag` and `mention` terms are updated to match its tokens.
+- **Links chosen per token** — each token links to the networks you enable, in the order you set, and the front end renders the links at display time.
+- **Blogosphere** — hashtag archives can show matching posts from your WordPress peer sites, through TermConnect.
+- **Cross-site matching** — mentions match across peer sites running this plugin by the person's profile URI.
+
+The [User Guide](user-guide.html) covers each of these in full.
+
+## Documentation map
+
+- **[User Guide](user-guide.html)** — for site owners: settings and network ordering, the inline editor tokens, hashtag vs. mention rendering, mention handles, and the Blogosphere section and `[social_blogosphere]` shortcode.
+- **[Developer Reference](developer-reference.html)** — the network registry filter, REST endpoints, the TermConnect integration (link types, `tc_link_uri`, `tc_enabled_taxonomies`, peer author search), and how token markup maps to taxonomy terms.
+- **[Architecture](architecture/)** — for contributors: file structure and loading, function and hook references, and data storage.
+
+## Requirements
+
+| Item | Version |
+|------|---------|
+| WordPress | 6.6+ |
+| PHP | 7.4+ |
+| TermConnect | required |
+| [HyperTaxonomy](https://hypertaxonomy.org/hypertaxonomy/) | optional (relevance search, relationships) |
+| [WP-SKOS](https://hypertaxonomy.org/wp-skos/) | optional (SKOS concept output) |
+
+## Getting started
+
+1. Install and activate **[TermConnect](https://hypertaxonomy.org/termconnect/)**.
+2. Install from the [WordPress.org plugin directory](https://wordpress.org/plugins/termconnect-social/), or download the zip from [GitHub Releases](https://github.com/HyperTaxonomy/termconnect-social/releases) and upload via **Plugins → Add New → Upload Plugin**, then activate it.
+3. Go to **Settings → TermConnect Social** to enable and order the networks you want.
+4. In a post, type `#` followed by a word and pick or create the hashtag. Save, and the post gets that hashtag term; view the post to see the token's links.
+
+## External services
+
+TermConnect Social contacts outside services only through TermConnect, from the site's server, for these features:
+
+- **Profile search for mentions.** When an editor types a handle in a mention term's External Links field, the typed text is sent to the network's public profile search to suggest matching accounts. This is only for networks the site owner has enabled, and only while an editor is typing.
+  - GitHub (api.github.com): [Terms of Service](https://docs.github.com/en/site-policy/github-terms/github-terms-of-service), [Privacy Statement](https://docs.github.com/en/site-policy/privacy-policies/github-general-privacy-statement)
+  - Bluesky (public.api.bsky.app): [Terms of Service](https://bsky.social/about/support/tos), [Privacy Policy](https://bsky.social/about/support/privacy-policy)
+- **Blogosphere.** When the Blogosphere network is enabled, a hashtag archive requests posts with that hashtag from the WordPress peer sites the site owner has set up in TermConnect. Requests contain the hashtag being looked up. These are sites the site owner chooses, so their own terms and privacy policies apply.
+
+Links to social networks in posts are ordinary links: nothing is sent to a network unless a visitor follows one.
+
+## License
+
+GPLv2 or later — https://www.gnu.org/licenses/gpl-2.0.html

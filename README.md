@@ -1,0 +1,45 @@
+# TermConnect Social
+
+Inline `#hashtags` and `@mentions` as taxonomy terms, with per-instance links to the social networks you enable. Part of the [HyperTaxonomy Suite](https://hypertaxonomy.org); built on [TermConnect](https://hypertaxonomy.org/termconnect/).
+
+## What it does
+
+- **Two flat taxonomies** — `hashtag` (primary) and `mention` (secondary). Terms are assigned to posts **automatically** from the inline tokens in your content; there is no taxonomy meta box.
+- **Inline tokens in the editor** — type `#` or `@` to autocomplete existing terms and local users, or select text and click the `#`/`@` toolbar button to tokenize it. Pick which networks each token links to.
+- **Smart hashtag links** — one enabled network → the token links straight to it; several → the token opens a pane of choices; none → links to the local archive (or plain text, your choice).
+- **Mention profiles** — per-network handles are stored on the mention term and reused; a mention renders as a direct icon + handle link (one profile) or a pane of profiles (several).
+- **Drag-to-order networks** in *Settings → TermConnect Social*; the order drives the editor and the front end. Toggling a network updates every post at once.
+- **Blogosphere** — aggregates hashtag post summaries from your WordPress peers (via TermConnect) onto the hashtag archive, each linking out to the peer. On mentions, it turns a person's WordPress author profiles on or off.
+- **Cross-site matching** — mentions match across peer sites running this plugin by shared network handle (profile URI), even when slugs and labels differ.
+
+## Requirements
+
+| Plugin | Role |
+|--------|------|
+| **TermConnect** | Required — link types, identifier storage + matching, peer fetching |
+| **HyperTaxonomy** | Optional — relevance search and relationships |
+| **WP-SKOS** | Optional — SKOS concept output |
+
+## Quick start
+
+1. Activate **TermConnect**, then **TermConnect Social**.
+2. In *Settings → TermConnect Social*, enable and order the networks you want.
+3. In a post, type `#` or `@` and pick a term; the token's panel chooses which networks (hashtags) or configured profiles (mentions) to show. Mention handles themselves are set on the term's edit screen (External Links).
+
+## Documentation
+
+Full documentation is published at [hypertaxonomy.org/termconnect-social](https://hypertaxonomy.org/termconnect-social) (source in [`docs/`](docs/)):
+
+- **[User Guide](docs/user-guide.md)** — settings and network ordering, the inline editor tokens, hashtag vs. mention rendering, mention handles, and the Blogosphere section and `[social_blogosphere]` shortcode.
+- **[Developer Reference](docs/developer-reference.md)** — the network registry filter, REST endpoints, the TermConnect integration (link types, `tc_link_uri`, `tc_enabled_taxonomies`, peer author search), and how token markup maps to taxonomy terms.
+- **[Architecture](docs/architecture/index.md)** — file structure and loading, function and hook references, and data storage. Coding standards for the whole suite are in HyperTaxonomy's [Contributing guide](https://hypertaxonomy.org/hypertaxonomy/architecture/contributing.html).
+
+## Translations
+
+TermConnect Social is translation-ready and ships with a complete translation template: `languages/termconnect-social.pot`.
+
+To contribute a translation: copy the template to `languages/termconnect-social-<locale>.po`, translate it, and open a pull request — the build compiles it (and, for block-editor strings, generates the required JSON) automatically. See [`utils/make-pot.sh`](utils/make-pot.sh) and [`utils/make-json.py`](utils/make-json.py).
+
+## License
+
+GPLv2 or later.
