@@ -5,8 +5,17 @@ nav_order: 4
 ---
 
 # Data Storage
+{: .no_toc }
 
-TermConnect Social has no tables. It stores its terms in two taxonomies, mention links through TermConnect, and its settings and caches in an option and transients. For what uninstalling removes, see [User Guide → Uninstalling](../user-guide.html#uninstalling).
+TermConnect Social has no tables. It stores its terms in two taxonomies, mention links through TermConnect, and its settings and caches in an option and transients. For what uninstalling removes, see [User Guide&nbsp;→ Uninstalling](../user-guide.html#uninstalling).
+
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
 
 ## Taxonomies
 
@@ -19,13 +28,13 @@ TermConnect Social has no tables. It stores its terms in two taxonomies, mention
 
 | Key | Value |
 |---|---|
-| `_tc_link_social_{network}` | A mention's handle on a network. Stored through TermConnect, as link type `social_{network}`. |
-| `_tc_link_local_site` | The local author a mention represents, as TermConnect link type `local_site`. |
-| `_tcs_user_id` | The local user a mention belongs to. |
+| `_tconn_link_social_{network}` | A mention's handle on a network. Stored through TermConnect, as link type `social_{network}`. |
+| `_tconn_link_local_site` | The local author a mention represents, as TermConnect link type `local_site`. |
+| `_tcsoc_user_id` | The local user a mention belongs to. |
 
 ## Option
 
-`tcs_settings` holds the settings below. Until they are first saved it is stored empty (defaults apply), autoloaded, so reading it never queries for a missing option:
+`tcsoc_settings` holds the settings below. Until they are first saved it is stored empty (defaults apply), autoloaded, so reading it never queries for a missing option:
 
 | Key | Value |
 |---|---|
@@ -36,4 +45,4 @@ TermConnect Social has no tables. It stores its terms in two taxonomies, mention
 
 ## Transient
 
-`tcs_bg_pool_{md5}` holds the posts fetched from peer sites for a hashtag's Blogosphere section.
+`tcsoc_bg_pool_{md5}` holds the posts fetched from peer sites for a hashtag's Blogosphere section.

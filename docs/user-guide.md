@@ -4,12 +4,21 @@ nav_order: 2
 ---
 
 # User Guide
+{: .no_toc }
 
 How to choose the networks your hashtags and mentions link to, write tokens in the block editor, decide what each one links to, and show posts from peer sites on hashtag archives. For the filters and REST endpoints, see the [Developer Reference](developer-reference.html).
 
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
+
 ## Enabling and ordering networks
 
-Go to **Settings → TermConnect Social**. All networks start disabled, including Blogosphere, so until you enable one, tokens only link to the local archive. Each supported network has a row you can:
+Go to **Settings&nbsp;→ TermConnect Social**. All networks start disabled, including Blogosphere, so until you enable one, tokens only link to the local archive. Each supported network has a row you can:
 
 - **Enable / disable** with its checkbox. Disabling a network removes its links from every post at once.
 - **Drag to reorder** (the move handle on the left). The order here is the order networks are offered in the editor and rendered on the front end.
@@ -27,7 +36,7 @@ The **Delete data on uninstall** option is at the bottom of the screen; see [Uni
 
 ## Writing hashtags and mentions
 
-In any rich-text field in the block editor, type `#` or `@`. This works in posts by default; developers can add other post types with the `tcs_token_post_types` filter. An autocomplete list appears:
+In any rich-text field in the block editor, type `#` or `@`. This works in posts by default; developers can add other post types with the `tcsoc_token_post_types` filter. An autocomplete list appears:
 
 - `#` — searches existing **hashtag** terms; choose one, or pick "Create #…" to make a new one.
 - `@` — searches existing **mention** terms and your **local users** in one combined list. Picking a local user ties the mention to that person's account (not just their display name), and automatically sets the term's "Local site" profile link the first time — so two different users who happen to share a display name are never merged into the same mention.
@@ -57,7 +66,7 @@ Place the caret inside a token and a small panel opens (or click the toolbar but
 
 #### Setting a person's handles and profiles
 
-A mention's identifiers are configured once, on the **mention term's edit screen** (**Posts → Mentions** → edit a term → *External links*), and reused everywhere that person is mentioned:
+A mention's identifiers are configured once, on the **mention term's edit screen** (**Posts&nbsp;→ Mentions**&nbsp;→ edit a term&nbsp;→ *External links*), and reused everywhere that person is mentioned:
 
 - **Social handles** — for networks with a public profile search (currently **GitHub** and **Bluesky**) the field autocompletes; for the rest, type the handle directly (a pasted profile URL or a leading `@` is cleaned up automatically).
 - **Peer sites** — a WordPress-peer link on a mention searches that peer's **authors** (a person is an author there, not a tag) and links to their author profile.
@@ -65,7 +74,7 @@ A mention's identifiers are configured once, on the **mention term's edit screen
 
 ![A mention's edit screen with the person's handles on four networks in the External Links panel](assets/images/screenshots/mention-edit.png)
 
-The **Posts → Hashtags** and **Posts → Mentions** lists have **Networks** and **Profiles** columns showing what each term links to.
+The **Posts&nbsp;→ Hashtags** and **Posts&nbsp;→ Mentions** lists have **Networks** and **Profiles** columns showing what each term links to.
 
 ![The Mentions list with the Profiles column circled: each person's networks shown as icons](assets/images/screenshots/mentions-profiles.png)
 
@@ -75,12 +84,12 @@ The links are computed at display time from the per-token selection intersected 
 
 [![A post on the front end: a mention link and hashtags, with one hashtag's network pane open](assets/images/screenshots/front-end-tokens.png){: .screenshot-small}](assets/images/screenshots/front-end-tokens.png)
 
-- **Hashtag with one network** → the token links directly to that network's hashtag page. If that one is Blogosphere, it links to the local archive.
-- **Hashtag with several networks** → clicking the token opens a small pane listing each network, with Blogosphere linking to the local archive.
-- **Hashtag with no enabled networks** → links to the local archive, or plain text (per the setting).
-- **Mention with one profile** → the token renders inline as the network icon + handle, linking to that profile (in place of the `@name`). A profile on this site keeps the `@name` instead.
-- **Mention with several profiles** → the `@name` stays and clicking it opens a pane of icon + handle links. Social networks show as "handle (Name)" and WordPress author profiles as "Name @ Site".
-- **Mention with no profiles** → links to the local archive, or plain text (the same setting as hashtags).
+- **Hashtag with one network**&nbsp;→ the token links directly to that network's hashtag page. If that one is Blogosphere, it links to the local archive.
+- **Hashtag with several networks**&nbsp;→ clicking the token opens a small pane listing each network, with Blogosphere linking to the local archive.
+- **Hashtag with no enabled networks**&nbsp;→ links to the local archive, or plain text (per the setting).
+- **Mention with one profile**&nbsp;→ the token renders inline as the network icon + handle, linking to that profile (in place of the `@name`). A profile on this site keeps the `@name` instead.
+- **Mention with several profiles**&nbsp;→ the `@name` stays and clicking it opens a pane of icon + handle links. Social networks show as "handle (Name)" and WordPress author profiles as "Name @ Site".
+- **Mention with no profiles**&nbsp;→ links to the local archive, or plain text (the same setting as hashtags).
 
 ## The Blogosphere section
 

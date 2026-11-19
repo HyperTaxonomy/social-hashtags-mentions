@@ -14,10 +14,10 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-add_action( 'admin_menu', 'tcs_admin_menu' );
-add_action( 'admin_init', 'tcs_admin_handle_save' );
-add_action( 'admin_enqueue_scripts', 'tcs_admin_enqueue' );
-add_filter( 'plugin_action_links_' . TCS_PLUGIN_BASENAME, 'tcs_plugin_action_links' );
+add_action( 'admin_menu', 'tcsoc_admin_menu' );
+add_action( 'admin_init', 'tcsoc_admin_handle_save' );
+add_action( 'admin_enqueue_scripts', 'tcsoc_admin_enqueue' );
+add_filter( 'plugin_action_links_' . TCSOC_PLUGIN_BASENAME, 'tcsoc_plugin_action_links' );
 
 /**
  * Adds a Settings link to the plugin's row on the Plugins screen.
@@ -26,7 +26,7 @@ add_filter( 'plugin_action_links_' . TCS_PLUGIN_BASENAME, 'tcs_plugin_action_lin
  * @param string[] $links Existing action links.
  * @return string[]
  */
-function tcs_plugin_action_links( array $links ): array {
+function tcsoc_plugin_action_links( array $links ): array {
     $url      = admin_url( 'options-general.php?page=termconnect-social' );
     $settings = '<a href="' . esc_url( $url ) . '">' . esc_html__( 'Settings', 'termconnect-social' ) . '</a>';
     array_unshift( $links, $settings );
@@ -38,13 +38,13 @@ function tcs_plugin_action_links( array $links ): array {
  *
  * @since 1.0.0
  */
-function tcs_admin_menu(): void {
+function tcsoc_admin_menu(): void {
     add_options_page(
         __( 'TermConnect Social', 'termconnect-social' ),
         __( 'TermConnect Social', 'termconnect-social' ),
         'manage_options',
         'termconnect-social',
-        'tcs_admin_render'
+        'tcsoc_admin_render'
     );
 }
 
@@ -54,22 +54,22 @@ function tcs_admin_menu(): void {
  * @since 1.0.0
  * @param string $hook Current admin page hook.
  */
-function tcs_admin_enqueue( string $hook ): void {
+function tcsoc_admin_enqueue( string $hook ): void {
     if ( 'settings_page_termconnect-social' !== $hook ) {
         return;
     }
     wp_enqueue_script(
-        'tcs-settings',
-        TCS_PLUGIN_URL . 'assets/js/tcs-settings.js',
+        'tcsoc-settings',
+        TCSOC_PLUGIN_URL . 'assets/js/tcsoc-settings.js',
         array( 'jquery', 'jquery-ui-sortable' ),
-        TCS_VERSION,
+        TCSOC_VERSION,
         true
     );
     wp_enqueue_style(
         'termconnect-social-admin',
-        TCS_PLUGIN_URL . 'assets/css/admin.css',
+        TCSOC_PLUGIN_URL . 'assets/css/admin.css',
         array( 'dashicons' ),
-        TCS_VERSION
+        TCSOC_VERSION
     );
 }
 
@@ -78,19 +78,19 @@ function tcs_admin_enqueue( string $hook ): void {
  *
  * @since 1.0.0
  */
-function tcs_admin_handle_save(): void {
-    if ( ! isset( $_POST['tcs_settings_nonce'] ) ) {
+function tcsoc_admin_handle_save(): void {
+    if ( ! isset( $_POST['tcsoc_settings_nonce'] ) ) {
         return;
     }
-    if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['tcs_settings_nonce'] ) ), 'tcs_settings_save' ) ) {
+    if ( ! wp_verify_nonce( sanitize_key( wp_unslash( $_POST['tcsoc_settings_nonce'] ) ), 'tcsoc_settings_save' ) ) {
         return;
     }
     if ( ! current_user_can( 'manage_options' ) ) {
         wp_die( esc_html__( 'Permission denied.', 'termconnect-social' ) );
     }
 
-    $order   = isset( $_POST['tcs_order'] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_POST['tcs_order'] ) ) : array();
-    $enabled = isset( $_POST['tcs_enabled'] ) ? map_deep( (array) wp_unslash( $_POST['tcs_enabled'] ), 'sanitize_text_field' ) : array();
+    $order   = isset( $_POST['tcsoc_order'] ) ? array_map( 'sanitize_key', (array) wp_unslash( $_POST['tcsoc_order'] ) ) : array();
+    $enabled = isset( $_POST['tcsoc_enabled'] ) ? map_deep( (array) wp_unslash( $_POST['tcsoc_enabled'] ), 'sanitize_text_field' ) : array();
 
     $networks = array();
     foreach ( $order as $slug ) {
@@ -100,13 +100,13 @@ function tcs_admin_handle_save(): void {
         $networks[ $slug ] = ! empty( $enabled[ $slug ] );
     }
 
-    $auto    = isset( $_POST['tcs_blogosphere_auto_append'] );
-    $no_link = isset( $_POST['tcs_hashtag_no_link'] ) ? sanitize_key( wp_unslash( $_POST['tcs_hashtag_no_link'] ) ) : 'archive';
+    $auto    = isset( $_POST['tcsoc_blogosphere_auto_append'] );
+    $no_link = isset( $_POST['tcsoc_hashtag_no_link'] ) ? sanitize_key( wp_unslash( $_POST['tcsoc_hashtag_no_link'] ) ) : 'archive';
 
-    tcs_save_settings( $networks, $auto, $no_link, isset( $_POST['tcs_delete_on_uninstall'] ) );
+    tcsoc_save_settings( $networks, $auto, $no_link, isset( $_POST['tcsoc_delete_on_uninstall'] ) );
 
     wp_safe_redirect( add_query_arg(
-        array( 'page' => 'termconnect-social', 'tcs-saved' => '1' ),
+        array( 'page' => 'termconnect-social', 'tcsoc-saved' => '1' ),
         admin_url( 'options-general.php' )
     ) );
     exit;
@@ -117,24 +117,24 @@ function tcs_admin_handle_save(): void {
  *
  * @since 1.0.0
  */
-function tcs_admin_render(): void {
+function tcsoc_admin_render(): void {
     if ( ! current_user_can( 'manage_options' ) ) {
         wp_die( esc_html__( 'Permission denied.', 'termconnect-social' ) );
     }
 
-    $states   = tcs_get_network_states();
-    $auto     = tcs_blogosphere_auto_append_setting();
-    $no_link  = tcs_no_link_mode();
-    $tc_ready = function_exists( 'tc_get_all_link_types' );
+    $states   = tcsoc_get_network_states();
+    $auto     = tcsoc_blogosphere_auto_append_setting();
+    $no_link  = tcsoc_no_link_mode();
+    $tconn_ready = function_exists( 'tconn_get_all_link_types' );
     ?>
-    <div class="wrap tcs-settings">
+    <div class="wrap tcsoc-settings">
         <h1><?php esc_html_e( 'TermConnect Social', 'termconnect-social' ); ?></h1>
 
-        <?php if ( isset( $_GET['tcs-saved'] ) ) : ?>
+        <?php if ( isset( $_GET['tcsoc-saved'] ) ) : ?>
             <div class="notice notice-success is-dismissible"><p><?php esc_html_e( 'Settings saved.', 'termconnect-social' ); ?></p></div>
         <?php endif; ?>
 
-        <?php if ( ! $tc_ready ) : ?>
+        <?php if ( ! $tconn_ready ) : ?>
             <div class="notice notice-error"><p><?php esc_html_e( 'TermConnect is required and does not appear to be active.', 'termconnect-social' ); ?></p></div>
         <?php endif; ?>
 
@@ -143,13 +143,13 @@ function tcs_admin_render(): void {
         </p>
 
         <form method="post" action="">
-            <?php wp_nonce_field( 'tcs_settings_save', 'tcs_settings_nonce' ); ?>
+            <?php wp_nonce_field( 'tcsoc_settings_save', 'tcsoc_settings_nonce' ); ?>
 
             <h2><?php esc_html_e( 'Networks', 'termconnect-social' ); ?></h2>
-            <ul class="tcs-network-list">
+            <ul class="tcsoc-network-list">
                 <?php foreach ( $states as $slug => $is_enabled ) : ?>
                     <?php
-                    $def = tcs_get_network( $slug );
+                    $def = tcsoc_get_network( $slug );
                     if ( ! $def ) {
                         continue;
                     }
@@ -161,15 +161,15 @@ function tcs_admin_render(): void {
                         $supports[] = __( 'Mentions', 'termconnect-social' );
                     }
                     ?>
-                    <li class="tcs-network-item">
-                        <span class="tcs-drag" title="<?php esc_attr_e( 'Drag to reorder', 'termconnect-social' ); ?>" aria-hidden="true">&#8942;</span>
-                        <input type="hidden" name="tcs_order[]" value="<?php echo esc_attr( $slug ); ?>" />
-                        <label class="tcs-network-label">
-                            <input type="checkbox" name="tcs_enabled[<?php echo esc_attr( $slug ); ?>]" value="1" <?php checked( $is_enabled ); ?> />
-                            <?php echo wp_kses( tcs_network_icon_html( $slug, $def['icon'] ?? 'dashicons-admin-links' ), tcs_allowed_html() ); ?>
-                            <span class="tcs-network-name"><?php echo esc_html( $def['label'] ); ?></span>
+                    <li class="tcsoc-network-item">
+                        <span class="tcsoc-drag" title="<?php esc_attr_e( 'Drag to reorder', 'termconnect-social' ); ?>" aria-hidden="true">&#8942;</span>
+                        <input type="hidden" name="tcsoc_order[]" value="<?php echo esc_attr( $slug ); ?>" />
+                        <label class="tcsoc-network-label">
+                            <input type="checkbox" name="tcsoc_enabled[<?php echo esc_attr( $slug ); ?>]" value="1" <?php checked( $is_enabled ); ?> />
+                            <?php echo wp_kses( tcsoc_network_icon_html( $slug, $def['icon'] ?? 'dashicons-admin-links' ), tcsoc_allowed_html() ); ?>
+                            <span class="tcsoc-network-name"><?php echo esc_html( $def['label'] ); ?></span>
                         </label>
-                        <span class="tcs-network-supports">
+                        <span class="tcsoc-network-supports">
                             <?php
                             echo esc_html( implode( ' · ', $supports ) );
                             if ( ! empty( $def['internal'] ) ) {
@@ -187,7 +187,7 @@ function tcs_admin_render(): void {
                     <th scope="row"><?php esc_html_e( 'Blogosphere', 'termconnect-social' ); ?></th>
                     <td>
                         <label>
-                            <input type="checkbox" name="tcs_blogosphere_auto_append" value="1" <?php checked( $auto ); ?> />
+                            <input type="checkbox" name="tcsoc_blogosphere_auto_append" value="1" <?php checked( $auto ); ?> />
                             <?php esc_html_e( 'Automatically append the Blogosphere section to hashtag archives.', 'termconnect-social' ); ?>
                         </label>
                         <p class="description">
@@ -198,8 +198,8 @@ function tcs_admin_render(): void {
                 <tr>
                     <th scope="row"><?php esc_html_e( 'Tokens with no enabled links', 'termconnect-social' ); ?></th>
                     <td>
-                        <label><input type="radio" name="tcs_hashtag_no_link" value="archive" <?php checked( 'archive', $no_link ); ?> /> <?php esc_html_e( 'Link to the local archive', 'termconnect-social' ); ?></label><br />
-                        <label><input type="radio" name="tcs_hashtag_no_link" value="plain" <?php checked( 'plain', $no_link ); ?> /> <?php esc_html_e( 'Render as plain text (no link)', 'termconnect-social' ); ?></label>
+                        <label><input type="radio" name="tcsoc_hashtag_no_link" value="archive" <?php checked( 'archive', $no_link ); ?> /> <?php esc_html_e( 'Link to the local archive', 'termconnect-social' ); ?></label><br />
+                        <label><input type="radio" name="tcsoc_hashtag_no_link" value="plain" <?php checked( 'plain', $no_link ); ?> /> <?php esc_html_e( 'Render as plain text (no link)', 'termconnect-social' ); ?></label>
                         <p class="description"><?php esc_html_e( 'Applies to both hashtags and mentions whose networks resolve to no links.', 'termconnect-social' ); ?></p>
                     </td>
                 </tr>
@@ -211,7 +211,7 @@ function tcs_admin_render(): void {
                     <th scope="row"><?php esc_html_e( 'Delete data on uninstall', 'termconnect-social' ); ?></th>
                     <td>
                         <label>
-                            <input type="checkbox" name="tcs_delete_on_uninstall" value="1" <?php checked( ! empty( tcs_get_settings()['delete_on_uninstall'] ) ); ?> />
+                            <input type="checkbox" name="tcsoc_delete_on_uninstall" value="1" <?php checked( ! empty( tcsoc_get_settings()['delete_on_uninstall'] ) ); ?> />
                             <?php esc_html_e( 'Delete mention handles and their links to local users when the plugin is deleted.', 'termconnect-social' ); ?>
                         </label>
                         <p class="description">
@@ -234,10 +234,12 @@ function tcs_admin_render(): void {
  *
  * @since 1.0.0
  */
-function tcs_admin_justify_help_text() {
+function tcsoc_admin_justify_help_text() {
     $page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
     if ( in_array( $page, array( 'termconnect-social' ), true ) ) {
-        echo '<style>.wrap p:not(td p):not(th p):not(.notice p), .wrap p:has(+ table) { text-align: justify; hyphens: none; }</style>';
+        wp_register_style( 'tcsoc-admin-help-text', false, array(), TCSOC_VERSION );
+        wp_add_inline_style( 'tcsoc-admin-help-text', '.wrap p:not(td p):not(th p):not(.notice p), .wrap p:has(+ table) { text-align: justify; hyphens: none; }' );
+        wp_print_styles( 'tcsoc-admin-help-text' );
     }
 }
-add_action( 'admin_head', 'tcs_admin_justify_help_text' );
+add_action( 'admin_head', 'tcsoc_admin_justify_help_text' );

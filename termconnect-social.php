@@ -21,19 +21,19 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-define( 'TCS_PLUGIN_FILE',     __FILE__ );
-define( 'TCS_PLUGIN_DIR',      plugin_dir_path( __FILE__ ) );
-define( 'TCS_PLUGIN_URL',      plugin_dir_url( __FILE__ ) );
-define( 'TCS_VERSION',         '1.0.0' );
-define( 'TCS_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
+define( 'TCSOC_PLUGIN_FILE',     __FILE__ );
+define( 'TCSOC_PLUGIN_DIR',      plugin_dir_path( __FILE__ ) );
+define( 'TCSOC_PLUGIN_URL',      plugin_dir_url( __FILE__ ) );
+define( 'TCSOC_VERSION',         '1.0.0' );
+define( 'TCSOC_PLUGIN_BASENAME', plugin_basename( __FILE__ ) );
 
-register_activation_hook( __FILE__, 'tcs_activate' );
-register_deactivation_hook( __FILE__, 'tcs_deactivate' );
+register_activation_hook( __FILE__, 'tcsoc_activate' );
+register_deactivation_hook( __FILE__, 'tcsoc_deactivate' );
 
 // Load translations regardless of whether TermConnect is active, so the
 // requirement notice is translatable too. Hooked on init per WP 6.7+ guidance.
 add_action( 'init', static function () {
-    load_plugin_textdomain( 'termconnect-social', false, dirname( TCS_PLUGIN_BASENAME ) . '/languages' );
+    load_plugin_textdomain( 'termconnect-social', false, dirname( TCSOC_PLUGIN_BASENAME ) . '/languages' );
 } );
 
 /**
@@ -41,9 +41,9 @@ add_action( 'init', static function () {
  *
  * @since 1.0.0
  */
-function tcs_activate(): void {
-    require_once TCS_PLUGIN_DIR . 'includes/taxonomies.php';
-    tcs_register_taxonomies();
+function tcsoc_activate(): void {
+    require_once TCSOC_PLUGIN_DIR . 'includes/taxonomies.php';
+    tcsoc_register_taxonomies();
     flush_rewrite_rules();
 }
 
@@ -52,7 +52,7 @@ function tcs_activate(): void {
  *
  * @since 1.0.0
  */
-function tcs_deactivate(): void {
+function tcsoc_deactivate(): void {
     // Not flush_rewrite_rules(): the plugin's rules are still registered during this request, so flush_rewrite_rules() would rebuild them; dropping the stored rules makes WordPress rebuild them without this plugin on the next request.
     delete_option( 'rewrite_rules' );
 }
@@ -70,8 +70,8 @@ function tcs_deactivate(): void {
  * @since 1.0.0
  * @return bool True when TermConnect is available.
  */
-function tcs_termconnect_active(): bool {
-    if ( function_exists( 'tc_get_all_link_types' ) ) {
+function tcsoc_termconnect_active(): bool {
+    if ( function_exists( 'tconn_get_all_link_types' ) ) {
         return true;
     }
     $plugin = 'termconnect/termconnect.php';
@@ -91,8 +91,8 @@ function tcs_termconnect_active(): bool {
 // registers hooks (it does not call TermConnect functions at load time), so it is
 // safe to load even when TermConnect's own loader runs later in the request.
 add_action( 'plugins_loaded', static function () {
-    if ( tcs_termconnect_active() ) {
-        require_once TCS_PLUGIN_DIR . 'includes/bootstrap.php';
+    if ( tcsoc_termconnect_active() ) {
+        require_once TCSOC_PLUGIN_DIR . 'includes/bootstrap.php';
         return;
     }
     add_action( 'admin_notices', static function () {

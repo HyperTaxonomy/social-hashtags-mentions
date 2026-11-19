@@ -5,6 +5,15 @@ nav_order: 1
 ---
 
 # File Structure & Loading
+{: .no_toc }
+
+## Table of contents
+{: .no_toc .text-delta }
+
+1. TOC
+{:toc}
+
+---
 
 ## File Structure
 
@@ -26,9 +35,9 @@ termconnect-social/
 │   │   ├── (images)                            
 │   │   └── README.md                           # Network icons
 │   └── js/                                     
-│       ├── tcs-editor.js                       # TermConnect Social — block editor integration.
-│       ├── tcs-frontend.js                     # TermConnect Social — frontend pane behavior.
-│       └── tcs-settings.js                     # TermConnect Social — admin settings sortable.
+│       ├── tcsoc-editor.js                       # TermConnect Social — block editor integration.
+│       ├── tcsoc-frontend.js                     # TermConnect Social — frontend pane behavior.
+│       └── tcsoc-settings.js                     # TermConnect Social — admin settings sortable.
 ├── docs/                                       # This documentation (Just-the-Docs)
 ├── includes/                                   
 │   ├── admin.php                               # Admin settings page: Settings → TermConnect Social.
@@ -51,18 +60,18 @@ termconnect-social/
 
 ### 1. Main file (`termconnect-social.php`)
 
-1. Define `TCS_PLUGIN_FILE`, `TCS_PLUGIN_DIR`, `TCS_PLUGIN_URL`, `TCS_VERSION` and `TCS_PLUGIN_BASENAME`.
+1. Define `TCSOC_PLUGIN_FILE`, `TCSOC_PLUGIN_DIR`, `TCSOC_PLUGIN_URL`, `TCSOC_VERSION` and `TCSOC_PLUGIN_BASENAME`.
 2. Register the activation and deactivation hooks.
 3. Load translations on `init`.
 4. On `plugins_loaded` at priority 20, require `includes/bootstrap.php` if TermConnect is active. Otherwise, show an admin notice and load nothing else.
 
 ### 2. Bootstrap (`includes/bootstrap.php`)
 
-1. **Always:** `networks.php`, `settings.php`, `taxonomies.php`, `link-types.php`, `term-sync.php`, `render.php`, `blogosphere.php` and `rest.php`, then hook `tcs_register_taxonomies()` on `init`.
+1. **Always:** `networks.php`, `settings.php`, `taxonomies.php`, `link-types.php`, `term-sync.php`, `render.php`, `blogosphere.php` and `rest.php`, then hook `tcsoc_register_taxonomies()` on `init`.
 2. **In admin requests:** `admin.php` and `term-columns.php`.
 3. **Always:** `editor.php`, which loads the block editor script.
 
 ### Activation and deactivation
 
-- **Activation** (`tcs_activate()`) registers the taxonomies and flushes the rewrite rules, so hashtag and mention archives work immediately.
-- **Deactivation** (`tcs_deactivate()`) deletes the stored rewrite rules, so WordPress rebuilds them without the plugin's archives.
+- **Activation** (`tcsoc_activate()`) registers the taxonomies and flushes the rewrite rules, so hashtag and mention archives work immediately.
+- **Deactivation** (`tcsoc_deactivate()`) deletes the stored rewrite rules, so WordPress rebuilds them without the plugin's archives.

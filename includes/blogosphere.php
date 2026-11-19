@@ -11,7 +11,7 @@
  * already returns (title, excerpt, thumbnail) and each card links out to the
  * peer's own post URL. Remote posts never enter the archive WP_Query, so the
  * native loop and its pagination are untouched. This section paginates with its
- * own query var (tcs_bg_page) over a cached, capped pool.
+ * own query var (tcsoc_bg_page) over a cached, capped pool.
  *
  * @package TermConnectSocial
  * @since 1.0.0
@@ -21,8 +21,8 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-add_shortcode( 'social_blogosphere', 'tcs_blogosphere_shortcode' );
-add_action( 'loop_end', 'tcs_blogosphere_auto_append' );
+add_shortcode( 'social_blogosphere', 'tcsoc_blogosphere_shortcode' );
+add_action( 'loop_end', 'tcsoc_blogosphere_auto_append' );
 
 /**
  * Whether the Blogosphere pseudo-network is enabled.
@@ -30,8 +30,8 @@ add_action( 'loop_end', 'tcs_blogosphere_auto_append' );
  * @since 1.0.0
  * @return bool
  */
-function tcs_blogosphere_enabled(): bool {
-    return tcs_is_network_enabled( 'blogosphere' );
+function tcsoc_blogosphere_enabled(): bool {
+    return tcsoc_is_network_enabled( 'blogosphere' );
 }
 
 /**
@@ -40,7 +40,7 @@ function tcs_blogosphere_enabled(): bool {
  * @since 1.0.0
  * @return bool
  */
-function tcs_blogosphere_auto_append_enabled(): bool {
+function tcsoc_blogosphere_auto_append_enabled(): bool {
     /**
      * Filters whether the Blogosphere section is auto-appended to hashtag archives.
      *
@@ -50,7 +50,7 @@ function tcs_blogosphere_auto_append_enabled(): bool {
      * @since 1.0.0
      * @param bool $enabled Default: true when the Blogosphere network is enabled and the setting is on.
      */
-    return (bool) apply_filters( 'tcs_blogosphere_auto_append', tcs_blogosphere_enabled() && tcs_blogosphere_auto_append_setting() );
+    return (bool) apply_filters( 'tcsoc_blogosphere_auto_append', tcsoc_blogosphere_enabled() && tcsoc_blogosphere_auto_append_setting() );
 }
 
 /**
@@ -61,13 +61,13 @@ function tcs_blogosphere_auto_append_enabled(): bool {
  * @since 1.0.0
  * @return array[]
  */
-function tcs_blogosphere_peers(): array {
-    if ( ! function_exists( 'tc_get_platform_link_types' ) || ! function_exists( 'tc_external_get_site_origin' ) ) {
+function tcsoc_blogosphere_peers(): array {
+    if ( ! function_exists( 'tconn_get_platform_link_types' ) || ! function_exists( 'tconn_external_get_site_origin' ) ) {
         return array();
     }
 
     $peers = array();
-    foreach ( tc_get_platform_link_types( 'wordpress' ) as $slug => $type ) {
+    foreach ( tconn_get_platform_link_types( 'wordpress' ) as $slug => $type ) {
         // Skip types explicitly scoped away from hashtag (e.g. this plugin's own
         // local_site type, which declares taxonomies => ['mention'] only, since it
         // maps mentions to local author profiles rather than being a real peer).
@@ -76,14 +76,14 @@ function tcs_blogosphere_peers(): array {
         if ( ! empty( $taxonomies ) && ! in_array( 'hashtag', $taxonomies, true ) ) {
             continue;
         }
-        $origin = tc_external_get_site_origin( (string) ( $type['uri_prefix'] ?? '' ) );
+        $origin = tconn_external_get_site_origin( (string) ( $type['uri_prefix'] ?? '' ) );
         if ( '' === $origin ) {
             continue;
         }
-        if ( function_exists( 'tc_external_is_blacklisted' ) && tc_external_is_blacklisted( $origin ) ) {
+        if ( function_exists( 'tconn_external_is_blacklisted' ) && tconn_external_is_blacklisted( $origin ) ) {
             continue;
         }
-        if ( function_exists( 'tc_external_validate_origin' ) && ! tc_external_validate_origin( $origin ) ) {
+        if ( function_exists( 'tconn_external_validate_origin' ) && ! tconn_external_validate_origin( $origin ) ) {
             continue;
         }
         $peers[] = array(
@@ -107,18 +107,18 @@ function tcs_blogosphere_peers(): array {
  * @param int    $fetch_size   Max posts to request per peer.
  * @return array[] Normalized peer posts.
  */
-function tcs_blogosphere_pool( string $hashtag_slug, int $fetch_size = 30 ): array {
-    if ( '' === $hashtag_slug || ! function_exists( 'tc_external_fetch_posts' ) || ! function_exists( 'tc_external_resolve_term_id' ) ) {
+function tcsoc_blogosphere_pool( string $hashtag_slug, int $fetch_size = 30 ): array {
+    if ( '' === $hashtag_slug || ! function_exists( 'tconn_external_fetch_posts' ) || ! function_exists( 'tconn_external_resolve_term_id' ) ) {
         return array();
     }
 
     // Peer origins are folded into the cache key (sorted, so key order doesn't
     // matter) so adding or removing a peer naturally produces a fresh key instead
     // of serving a pool cached under the old peer set for up to $ttl.
-    $peers        = tcs_blogosphere_peers();
+    $peers        = tcsoc_blogosphere_peers();
     $peer_origins = wp_list_pluck( $peers, 'origin' );
     sort( $peer_origins );
-    $cache_key = 'tcs_bg_pool_' . md5( $hashtag_slug . '|' . $fetch_size . '|' . implode( ',', $peer_origins ) );
+    $cache_key = 'tcsoc_bg_pool_' . md5( $hashtag_slug . '|' . $fetch_size . '|' . implode( ',', $peer_origins ) );
     $cached    = get_transient( $cache_key );
     if ( false !== $cached ) {
         return (array) $cached;
@@ -130,15 +130,15 @@ function tcs_blogosphere_pool( string $hashtag_slug, int $fetch_size = 30 ): arr
      * @since 1.0.0
      * @param int $ttl Default: 1 hour.
      */
-    $ttl = (int) apply_filters( 'tcs_blogosphere_cache_ttl', HOUR_IN_SECONDS );
+    $ttl = (int) apply_filters( 'tcsoc_blogosphere_cache_ttl', HOUR_IN_SECONDS );
 
     $merged = array();
     foreach ( $peers as $peer ) {
-        $remote_id = tc_external_resolve_term_id( $peer['origin'], 'hashtag', $hashtag_slug );
+        $remote_id = tconn_external_resolve_term_id( $peer['origin'], 'hashtag', $hashtag_slug );
         if ( ! $remote_id ) {
             continue;
         }
-        $posts = tc_external_fetch_posts(
+        $posts = tconn_external_fetch_posts(
             $peer['origin'],
             'hashtag',
             array( $remote_id ),
@@ -183,8 +183,8 @@ function tcs_blogosphere_pool( string $hashtag_slug, int $fetch_size = 30 ): arr
  * }
  * @return string HTML, or '' when there is nothing to show.
  */
-function tcs_render_blogosphere( array $args = array() ): string {
-    if ( ! tcs_blogosphere_enabled() ) {
+function tcsoc_render_blogosphere( array $args = array() ): string {
+    if ( ! tcsoc_blogosphere_enabled() ) {
         return '';
     }
 
@@ -201,14 +201,14 @@ function tcs_render_blogosphere( array $args = array() ): string {
         return '';
     }
 
-    $fetch_size = (int) apply_filters( 'tcs_blogosphere_fetch_size', max( 30, $per_page * 3 ) );
-    $pool       = tcs_blogosphere_pool( $hashtag, $fetch_size );
+    $fetch_size = (int) apply_filters( 'tcsoc_blogosphere_fetch_size', max( 30, $per_page * 3 ) );
+    $pool       = tcsoc_blogosphere_pool( $hashtag, $fetch_size );
     if ( empty( $pool ) ) {
         return '';
     }
 
     $total = count( $pool );
-    $page     = isset( $_GET['tcs_bg_page'] ) ? max( 1, absint( wp_unslash( $_GET['tcs_bg_page'] ) ) ) : 1;
+    $page     = isset( $_GET['tcsoc_bg_page'] ) ? max( 1, absint( wp_unslash( $_GET['tcsoc_bg_page'] ) ) ) : 1;
     $pages    = (int) ceil( $total / $per_page );
     $page     = min( $page, $pages );
     $offset   = ( $page - 1 ) * $per_page;
@@ -216,9 +216,9 @@ function tcs_render_blogosphere( array $args = array() ): string {
 
     ob_start();
     ?>
-    <section class="tcs-blogosphere" id="tcs-blogosphere" aria-label="<?php esc_attr_e( 'From around the blogosphere', 'termconnect-social' ); ?>">
-        <h2 class="tcs-blogosphere__title"><?php esc_html_e( 'From around the blogosphere', 'termconnect-social' ); ?></h2>
-        <ul class="tcs-blogosphere__list">
+    <section class="tcsoc-blogosphere" id="tcsoc-blogosphere" aria-label="<?php esc_attr_e( 'From around the blogosphere', 'termconnect-social' ); ?>">
+        <h2 class="tcsoc-blogosphere__title"><?php esc_html_e( 'From around the blogosphere', 'termconnect-social' ); ?></h2>
+        <ul class="tcsoc-blogosphere__list">
             <?php foreach ( $items as $post ) : ?>
                 <?php
                 $url     = (string) ( $post['url'] ?? '' );
@@ -227,35 +227,35 @@ function tcs_render_blogosphere( array $args = array() ): string {
                 $thumb   = (string) ( $post['thumbnail_url'] ?? '' );
                 $source  = (string) ( $post['peer_label'] ?? wp_parse_url( $url, PHP_URL_HOST ) );
                 ?>
-                <li class="tcs-blogosphere__item">
-                    <a class="tcs-blogosphere__link" href="<?php echo esc_url( $url ); ?>" rel="nofollow external noopener" target="_blank">
+                <li class="tcsoc-blogosphere__item">
+                    <a class="tcsoc-blogosphere__link" href="<?php echo esc_url( $url ); ?>" rel="nofollow external noopener" target="_blank">
                         <?php if ( '' !== $thumb ) : ?>
-                            <img class="tcs-blogosphere__thumb" src="<?php echo esc_url( $thumb ); ?>" alt="" loading="lazy" />
+                            <img class="tcsoc-blogosphere__thumb" src="<?php echo esc_url( $thumb ); ?>" alt="" loading="lazy" />
                         <?php endif; ?>
-                        <span class="tcs-blogosphere__title-text"><?php echo esc_html( $title ); ?></span>
+                        <span class="tcsoc-blogosphere__title-text"><?php echo esc_html( $title ); ?></span>
                     </a>
-                    <span class="tcs-blogosphere__source"><?php echo esc_html( $source ); ?></span>
+                    <span class="tcsoc-blogosphere__source"><?php echo esc_html( $source ); ?></span>
                     <?php if ( '' !== $excerpt ) : ?>
-                        <p class="tcs-blogosphere__excerpt"><?php echo esc_html( wp_trim_words( $excerpt, 30 ) ); ?></p>
+                        <p class="tcsoc-blogosphere__excerpt"><?php echo esc_html( wp_trim_words( $excerpt, 30 ) ); ?></p>
                     <?php endif; ?>
                 </li>
             <?php endforeach; ?>
         </ul>
         <?php if ( $pages > 1 ) : ?>
-            <nav class="tcs-blogosphere__pagination" aria-label="<?php esc_attr_e( 'Blogosphere navigation', 'termconnect-social' ); ?>">
+            <nav class="tcsoc-blogosphere__pagination" aria-label="<?php esc_attr_e( 'Blogosphere navigation', 'termconnect-social' ); ?>">
                 <?php if ( $page > 1 ) : ?>
-                    <a class="tcs-blogosphere__prev" href="<?php echo esc_url( add_query_arg( 'tcs_bg_page', $page - 1 ) . '#tcs-blogosphere' ); ?>">
+                    <a class="tcsoc-blogosphere__prev" href="<?php echo esc_url( add_query_arg( 'tcsoc_bg_page', $page - 1 ) . '#tcsoc-blogosphere' ); ?>">
                         <?php esc_html_e( '&larr; Newer', 'termconnect-social' ); ?>
                     </a>
                 <?php endif; ?>
-                <span class="tcs-blogosphere__page-of">
+                <span class="tcsoc-blogosphere__page-of">
                     <?php
                     /* translators: 1: current page, 2: total pages. */
                     echo esc_html( sprintf( __( 'Page %1$d of %2$d', 'termconnect-social' ), $page, $pages ) );
                     ?>
                 </span>
                 <?php if ( $page < $pages ) : ?>
-                    <a class="tcs-blogosphere__next" href="<?php echo esc_url( add_query_arg( 'tcs_bg_page', $page + 1 ) . '#tcs-blogosphere' ); ?>">
+                    <a class="tcsoc-blogosphere__next" href="<?php echo esc_url( add_query_arg( 'tcsoc_bg_page', $page + 1 ) . '#tcsoc-blogosphere' ); ?>">
                         <?php esc_html_e( 'Older &rarr;', 'termconnect-social' ); ?>
                     </a>
                 <?php endif; ?>
@@ -273,7 +273,7 @@ function tcs_render_blogosphere( array $args = array() ): string {
  * @param array $atts Shortcode attributes: hashtag, per_page.
  * @return string
  */
-function tcs_blogosphere_shortcode( $atts ): string {
+function tcsoc_blogosphere_shortcode( $atts ): string {
     $atts = shortcode_atts(
         array(
             'hashtag'  => '',
@@ -282,7 +282,7 @@ function tcs_blogosphere_shortcode( $atts ): string {
         is_array( $atts ) ? $atts : array(),
         'social_blogosphere'
     );
-    return tcs_render_blogosphere(
+    return tcsoc_render_blogosphere(
         array(
             'hashtag'  => sanitize_title( (string) $atts['hashtag'] ),
             'per_page' => (int) $atts['per_page'],
@@ -296,7 +296,7 @@ function tcs_blogosphere_shortcode( $atts ): string {
  * @since 1.0.0
  * @param WP_Query $query The query that just finished looping.
  */
-function tcs_blogosphere_auto_append( $query ): void {
+function tcsoc_blogosphere_auto_append( $query ): void {
     static $done = false;
     if ( $done ) {
         return;
@@ -307,11 +307,11 @@ function tcs_blogosphere_auto_append( $query ): void {
     if ( ! is_tax( 'hashtag' ) ) {
         return;
     }
-    if ( ! tcs_blogosphere_auto_append_enabled() ) {
+    if ( ! tcsoc_blogosphere_auto_append_enabled() ) {
         return;
     }
     $done = true;
-    // Every dynamic value in tcs_render_blogosphere() is already escaped. The allowlist
+    // Every dynamic value in tcsoc_render_blogosphere() is already escaped. The allowlist
     // keeps aria-label on <section>/<nav>, which wp_kses_post() would strip.
-    echo wp_kses( tcs_render_blogosphere(), tcs_allowed_html() );
+    echo wp_kses( tcsoc_render_blogosphere(), tcsoc_allowed_html() );
 }

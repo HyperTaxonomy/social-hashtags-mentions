@@ -2,7 +2,7 @@
 /**
  * Settings storage.
  *
- * Networks are stored as an ordered map ( slug => enabled ) in the tcs_settings
+ * Networks are stored as an ordered map ( slug => enabled ) in the tcsoc_settings
  * option. The key order is the display order, controlled by drag-and-drop in the
  * admin screen (admin.php). New networks added to the registry in a later version
  * appear at the end, disabled, until the admin enables them.
@@ -15,7 +15,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-const TCS_OPTION = 'tcs_settings';
+const TCSOC_OPTION = 'tcsoc_settings';
 
 /**
  * Returns the full settings array, with the network map normalized against the
@@ -24,8 +24,8 @@ const TCS_OPTION = 'tcs_settings';
  * @since 1.0.0
  * @return array{networks: array<string,bool>}
  */
-function tcs_get_settings(): array {
-    // Keyed by blog ID, same reasoning as tcs_get_network_registry(): a multisite
+function tcsoc_get_settings(): array {
+    // Keyed by blog ID, same reasoning as tcsoc_get_network_registry(): a multisite
     // caller that switch_to_blog()s between sites within one request must never be
     // served a different site's cached settings.
     static $cache = array();
@@ -34,17 +34,17 @@ function tcs_get_settings(): array {
         return $cache[ $blog_id ];
     }
 
-    $stored = get_option( TCS_OPTION, null );
+    $stored = get_option( TCSOC_OPTION, null );
     if ( null === $stored ) {
         // Never saved: store the empty settings (defaults apply), autoloaded, so later
         // requests don't query for a missing option.
-        add_option( TCS_OPTION, array(), '', true );
+        add_option( TCSOC_OPTION, array(), '', true );
         $stored = array();
     }
     $stored   = is_array( $stored ) ? $stored : array();
     $networks = isset( $stored['networks'] ) && is_array( $stored['networks'] ) ? $stored['networks'] : array();
 
-    $registry = tcs_get_network_registry();
+    $registry = tcsoc_get_network_registry();
 
     // Keep stored order for known networks, then append any new registry networks.
     $normalized = array();
@@ -76,8 +76,8 @@ function tcs_get_settings(): array {
  * @since 1.0.0
  * @return string 'archive' (link to the local term archive) or 'plain' (no link).
  */
-function tcs_no_link_mode(): string {
-    $settings = tcs_get_settings();
+function tcsoc_no_link_mode(): string {
+    $settings = tcsoc_get_settings();
     return $settings['hashtag_no_link'];
 }
 
@@ -87,8 +87,8 @@ function tcs_no_link_mode(): string {
  * @since 1.0.0
  * @return bool
  */
-function tcs_blogosphere_auto_append_setting(): bool {
-    $settings = tcs_get_settings();
+function tcsoc_blogosphere_auto_append_setting(): bool {
+    $settings = tcsoc_get_settings();
     return (bool) $settings['blogosphere_auto_append'];
 }
 
@@ -98,8 +98,8 @@ function tcs_blogosphere_auto_append_setting(): bool {
  * @since 1.0.0
  * @return array<string,bool>
  */
-function tcs_get_network_states(): array {
-    $settings = tcs_get_settings();
+function tcsoc_get_network_states(): array {
+    $settings = tcsoc_get_settings();
     return $settings['networks'];
 }
 
@@ -110,13 +110,13 @@ function tcs_get_network_states(): array {
  * @param string $taxonomy Optional taxonomy to filter by network support.
  * @return string[]
  */
-function tcs_get_enabled_networks( string $taxonomy = '' ): array {
+function tcsoc_get_enabled_networks( string $taxonomy = '' ): array {
     $out = array();
-    foreach ( tcs_get_network_states() as $slug => $enabled ) {
+    foreach ( tcsoc_get_network_states() as $slug => $enabled ) {
         if ( ! $enabled ) {
             continue;
         }
-        if ( '' !== $taxonomy && ! tcs_network_supports( $slug, $taxonomy ) ) {
+        if ( '' !== $taxonomy && ! tcsoc_network_supports( $slug, $taxonomy ) ) {
             continue;
         }
         $out[] = $slug;
@@ -131,8 +131,8 @@ function tcs_get_enabled_networks( string $taxonomy = '' ): array {
  * @param string $slug Network slug.
  * @return bool
  */
-function tcs_is_network_enabled( string $slug ): bool {
-    $states = tcs_get_network_states();
+function tcsoc_is_network_enabled( string $slug ): bool {
+    $states = tcsoc_get_network_states();
     return ! empty( $states[ $slug ] );
 }
 
@@ -146,8 +146,8 @@ function tcs_is_network_enabled( string $slug ): bool {
  * @param bool               $delete_on_uninstall Whether uninstalling removes mention handles.
  * @return bool
  */
-function tcs_save_settings( array $networks, bool $auto_append, string $no_link, bool $delete_on_uninstall ): bool {
-    $registry = tcs_get_network_registry();
+function tcsoc_save_settings( array $networks, bool $auto_append, string $no_link, bool $delete_on_uninstall ): bool {
+    $registry = tcsoc_get_network_registry();
     $clean    = array();
     foreach ( $networks as $slug => $enabled ) {
         if ( isset( $registry[ $slug ] ) ) {
@@ -155,7 +155,7 @@ function tcs_save_settings( array $networks, bool $auto_append, string $no_link,
         }
     }
     return (bool) update_option(
-        TCS_OPTION,
+        TCSOC_OPTION,
         array(
             'networks'                => $clean,
             'blogosphere_auto_append' => $auto_append,

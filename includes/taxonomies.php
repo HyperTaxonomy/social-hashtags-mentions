@@ -3,7 +3,7 @@
  * Taxonomy registration: hashtag (primary) and mention (secondary).
  *
  * Both are flat (non-hierarchical), public, REST-enabled, and attached to the
- * post types returned by tcs_token_post_types(). Term assignments are managed
+ * post types returned by tcsoc_token_post_types(). Term assignments are managed
  * automatically from inline tokens (see term-sync.php), so the default meta box
  * is suppressed.
  *
@@ -21,14 +21,14 @@ if ( ! defined( 'ABSPATH' ) ) {
  * @since 1.0.0
  * @return string[]
  */
-function tcs_token_post_types(): array {
+function tcsoc_token_post_types(): array {
     /**
      * Filters the post types that support inline hashtags and mentions.
      *
      * @since 1.0.0
      * @param string[] $post_types Default: post.
      */
-    return apply_filters( 'tcs_token_post_types', array( 'post' ) );
+    return apply_filters( 'tcsoc_token_post_types', array( 'post' ) );
 }
 
 /**
@@ -36,8 +36,8 @@ function tcs_token_post_types(): array {
  *
  * @since 1.0.0
  */
-function tcs_register_taxonomies(): void {
-    $post_types = tcs_token_post_types();
+function tcsoc_register_taxonomies(): void {
+    $post_types = tcsoc_token_post_types();
 
     register_taxonomy(
         'hashtag',

@@ -41,7 +41,7 @@
 	var apiFetch = wp.apiFetch;
 	var addFilter = wp.hooks.addFilter;
 
-	var data = window.TCSEditor || {};
+	var data = window.TCSocEditor || {};
 	var NETWORKS = data.networks || [];
 
 	var HASHTAG_FORMAT = 'termconnect-social/hashtag';
@@ -58,8 +58,8 @@
 		networks: 'data-tcs-networks',
 		userId: 'data-tcs-user-id',
 	};
-	var HASHTAG_SETTINGS = { tagName: 'a', className: 'tcs-hashtag', attributes: TOKEN_ATTRIBUTES };
-	var MENTION_SETTINGS = { tagName: 'a', className: 'tcs-mention', attributes: TOKEN_ATTRIBUTES };
+	var HASHTAG_SETTINGS = { tagName: 'a', className: 'tcsoc-hashtag', attributes: TOKEN_ATTRIBUTES };
+	var MENTION_SETTINGS = { tagName: 'a', className: 'tcsoc-mention', attributes: TOKEN_ATTRIBUTES };
 
 	// Resolve a Popover anchor at the active token. useAnchor is a hook, so it is
 	// always called when available (the availability is constant per environment);
@@ -106,7 +106,7 @@
 		var style = ( n && n.color ) ? { color: n.color } : undefined;
 		if ( n && n.svg ) {
 			return el( 'span', {
-				className: 'tcs-icon',
+				className: 'tcsoc-icon',
 				style: style,
 				'aria-hidden': 'true',
 				dangerouslySetInnerHTML: { __html: n.svg },
@@ -123,18 +123,18 @@
 	// (a handle/"handle (Name)"/"Name @ Site" for mentions, the network name for
 	// hashtags). Clicking the icon/text toggles too.
 	function netCheckRow( n, checked, onToggle ) {
-		return el( 'div', { key: n.slug, className: 'tcs-net-row' },
+		return el( 'div', { key: n.slug, className: 'tcsoc-net-row' },
 			el( CheckboxControl, {
 				label: '',
 				checked: checked,
 				onChange: function ( c ) { onToggle( c ); },
 			} ),
 			el( 'span', {
-				className: 'tcs-net-click',
+				className: 'tcsoc-net-click',
 				onClick: function () { onToggle( ! checked ); },
 			},
 				netIconEl( n ),
-				el( 'span', { className: 'tcs-net-text' }, n.label )
+				el( 'span', { className: 'tcsoc-net-text' }, n.label )
 			)
 		);
 	}
@@ -654,7 +654,7 @@
 				onClick: onButton,
 			} ),
 			open ? el( Popover, {
-				className: 'tcs-popover',
+				className: 'tcsoc-popover',
 				anchor: anchor,
 				placement: 'bottom-start',
 				// Don't move focus into the panel on open (it auto-opens when the caret
@@ -662,12 +662,12 @@
 				focusOnMount: false,
 				onClose: closePopover,
 			},
-				el( 'div', { className: 'tcs-popover__inner' },
+				el( 'div', { className: 'tcsoc-popover__inner' },
 					el( 'strong', null, __( 'Link this hashtag to:', 'termconnect-social' ) ),
 					nets.length ? nets.map( function ( n ) {
 						return netCheckRow( n, selected.indexOf( n.slug ) >= 0, function ( c ) { toggle( n.slug, c ); } );
 					} ) : el( 'p', null, __( 'No networks enabled.', 'termconnect-social' ) ),
-					isStaging ? el( 'div', { className: 'tcs-popover__actions', style: { marginTop: '10px', textAlign: 'right' } },
+					isStaging ? el( 'div', { className: 'tcsoc-popover__actions', style: { marginTop: '10px', textAlign: 'right' } },
 						el( Button, { variant: 'primary', onClick: commitStage }, __( 'Apply', 'termconnect-social' ) )
 					) : null
 				)
@@ -835,7 +835,7 @@
 				onClick: onButton,
 			} ),
 			open ? el( Popover, {
-				className: 'tcs-popover',
+				className: 'tcsoc-popover',
 				anchor: anchor,
 				placement: 'bottom-start',
 				// Don't move focus into the panel on open (it auto-opens when the caret
@@ -843,16 +843,16 @@
 				focusOnMount: false,
 				onClose: closePopover,
 			},
-				el( 'div', { className: 'tcs-popover__inner' },
+				el( 'div', { className: 'tcsoc-popover__inner' },
 					el( 'strong', null, __( 'Link this mention to:', 'termconnect-social' ) ),
 					( null === netList ) ? el( Spinner ) : null,
 					( netList && netList.length ) ? netList.map( function ( n ) {
 						return netCheckRow( n, selected.indexOf( n.slug ) >= 0, function ( c ) { toggle( n.slug, c ); } );
 					} ) : null,
-					( netList && ! netList.length ) ? el( 'p', { className: 'tcs-popover__hint' },
+					( netList && ! netList.length ) ? el( 'p', { className: 'tcsoc-popover__hint' },
 						__( 'No profiles are configured for this mention yet. Add them on the mention’s edit screen.', 'termconnect-social' )
 					) : null,
-					isStaging ? el( 'div', { className: 'tcs-popover__actions', style: { marginTop: '10px', textAlign: 'right' } },
+					isStaging ? el( 'div', { className: 'tcsoc-popover__actions', style: { marginTop: '10px', textAlign: 'right' } },
 						el( Button, { variant: 'primary', onClick: commitStage }, __( 'Apply', 'termconnect-social' ) )
 					) : null
 				)
@@ -881,7 +881,7 @@
 	function hashtagElement( opt ) {
 		var display = '#' + ( opt.slug || opt.name );
 		return el( 'a', {
-			className: 'tcs-hashtag',
+			className: 'tcsoc-hashtag',
 			href: opt.url || '#',
 			'data-tcs-tax': 'hashtag',
 			'data-tcs-term': opt.id ? String( opt.id ) : '',
@@ -893,7 +893,7 @@
 	function mentionElement( opt ) {
 		var display = '@' + ( opt.name || opt.slug );
 		return el( 'a', {
-			className: 'tcs-mention',
+			className: 'tcsoc-mention',
 			href: opt.url || '#',
 			'data-tcs-tax': 'mention',
 			'data-tcs-term': opt.id ? String( opt.id ) : '',
@@ -909,7 +909,7 @@
 	function hashtagCompleter() {
 		return {
 			name: 'termconnect-social/hashtag',
-			className: 'tcs-autocompleter',
+			className: 'tcsoc-autocompleter',
 			triggerPrefix: '#',
 			options: function ( query ) {
 				return searchTerms( 'hashtag', query ).then( function ( terms ) {
@@ -936,7 +936,7 @@
 	function mentionCompleter() {
 		return {
 			name: 'termconnect-social/mention',
-			className: 'tcs-autocompleter',
+			className: 'tcsoc-autocompleter',
 			triggerPrefix: '@',
 			options: function ( query ) {
 				// One @ list combining our mention terms and local site users.

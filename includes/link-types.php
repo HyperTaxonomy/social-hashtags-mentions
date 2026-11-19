@@ -3,14 +3,14 @@
  * TermConnect link-type integration.
  *
  * Each external (non-internal) network is registered with TermConnect as a
- * `social_{slug}` link type via the tc_link_types filter. The `provider` flag
+ * `social_{slug}` link type via the tconn_link_types filter. The `provider` flag
  * keeps these out of TC's Peer Sites admin (they are managed in this plugin's
  * settings) while staying active for the term-edit panel, REST, and peer
  * matching. The enabled flag is derived from this plugin's settings so the
  * admin toggles are the single source of truth — nothing is persisted in TC's
- * tc_link_types option.
+ * tconn_link_types option.
  *
- * URLs are produced through the tc_link_uri filter, which branches per taxonomy
+ * URLs are produced through the tconn_link_uri filter, which branches per taxonomy
  * (hashtag URL on the hashtag taxonomy, profile URL on the mention taxonomy)
  * and handles instance-based transforms (Mastodon).
  *
@@ -22,13 +22,13 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-add_filter( 'tc_link_types', 'tcs_register_link_types' );
-add_filter( 'tc_link_uri', 'tcs_filter_link_uri', 10, 5 );
-add_filter( 'tc_enabled_taxonomies', 'tcs_enable_tc_taxonomies' );
-add_filter( 'tc_suggest_config', 'tcs_suggest_config', 10, 4 );
-add_filter( 'tc_parse_suggest_response', 'tcs_parse_suggest_response', 10, 3 );
-add_filter( 'tc_taxonomy_peer_authors', 'tcs_mention_maps_to_peer_authors', 10, 2 );
-add_filter( 'tc_link_value', 'tcs_sanitize_handle', 10, 2 );
+add_filter( 'tconn_link_types', 'tcsoc_register_link_types' );
+add_filter( 'tconn_link_uri', 'tcsoc_filter_link_uri', 10, 5 );
+add_filter( 'tconn_enabled_taxonomies', 'tcsoc_enable_tc_taxonomies' );
+add_filter( 'tconn_suggest_config', 'tcsoc_suggest_config', 10, 4 );
+add_filter( 'tconn_parse_suggest_response', 'tcsoc_parse_suggest_response', 10, 3 );
+add_filter( 'tconn_taxonomy_peer_authors', 'tcsoc_mention_maps_to_peer_authors', 10, 2 );
+add_filter( 'tconn_link_value', 'tcsoc_sanitize_handle', 10, 2 );
 
 /**
  * Basic validation/normalization for free-form social handles.
@@ -44,13 +44,13 @@ add_filter( 'tc_link_value', 'tcs_sanitize_handle', 10, 2 );
  * @param string $slug Link type slug.
  * @return string Normalized handle, or '' to reject (removes the link).
  */
-function tcs_sanitize_handle( $id, string $slug ): string {
+function tcsoc_sanitize_handle( $id, string $slug ): string {
     if ( 0 !== strpos( $slug, 'social_' ) ) {
         return (string) $id;
     }
 
     $id  = trim( (string) $id );
-    $def = tcs_get_network( substr( $slug, 7 ) );
+    $def = tcsoc_get_network( substr( $slug, 7 ) );
 
     if ( false !== strpos( $id, '://' ) ) {
         if ( ! empty( $def['instance'] ) ) {
@@ -90,14 +90,14 @@ function tcs_sanitize_handle( $id, string $slug ): string {
  * @param string $taxonomy  Taxonomy slug.
  * @return bool
  */
-function tcs_mention_maps_to_peer_authors( $is_author, string $taxonomy ): bool {
+function tcsoc_mention_maps_to_peer_authors( $is_author, string $taxonomy ): bool {
     return 'mention' === $taxonomy ? true : (bool) $is_author;
 }
 
 /**
  * Opts the hashtag and mention taxonomies into TermConnect.
  *
- * This makes TermConnect expose the tc_links REST field and the htax_term_uri
+ * This makes TermConnect expose the tconn_links REST field and the htax_term_uri
  * matching parameter for these taxonomies, and include their terms in peer
  * resolution by shared identifier. The practical effect for mentions: two peer
  * sites that store the same network handle for a person (e.g. X: @jdoe) match by
@@ -108,8 +108,8 @@ function tcs_mention_maps_to_peer_authors( $is_author, string $taxonomy ): bool 
  * @param string[] $taxonomies Enabled taxonomy slugs.
  * @return string[]
  */
-function tcs_enable_tc_taxonomies( $taxonomies ): array {
-    return array_merge( (array) $taxonomies, tcs_taxonomies() );
+function tcsoc_enable_tc_taxonomies( $taxonomies ): array {
+    return array_merge( (array) $taxonomies, tcsoc_taxonomies() );
 }
 
 /**
@@ -119,8 +119,8 @@ function tcs_enable_tc_taxonomies( $taxonomies ): array {
  * @param array[] $types Existing link types keyed by slug.
  * @return array[]
  */
-function tcs_register_link_types( array $types ): array {
-    foreach ( tcs_get_network_registry() as $slug => $def ) {
+function tcsoc_register_link_types( array $types ): array {
+    foreach ( tcsoc_get_network_registry() as $slug => $def ) {
         if ( ! empty( $def['internal'] ) ) {
             continue; // Blogosphere has no external link type.
         }
@@ -130,11 +130,11 @@ function tcs_register_link_types( array $types ): array {
         $types[ $type_slug ] = array(
             'slug'             => $type_slug,
             'label'            => (string) $def['label'],
-            // Real URLs come from the tc_link_uri filter; this is only a fallback prefix.
+            // Real URLs come from the tconn_link_uri filter; this is only a fallback prefix.
             'uri_prefix'       => '',
             'description'      => __( 'Social network', 'termconnect-social' ),
             'platform'         => 'other',
-            'enabled'          => tcs_is_network_enabled( $slug ),
+            'enabled'          => tcsoc_is_network_enabled( $slug ),
             'show_on_archives' => true,
             'taxonomies'       => (array) $def['supports'],
             'provider'         => 'termconnect-social',
@@ -145,7 +145,7 @@ function tcs_register_link_types( array $types ): array {
     // A non-configurable "Local site" pseudo-peer: maps a mention to a local author.
     // It is a WordPress link type pointing at this site's own origin, so it rides the
     // same author autocomplete + /author/{nicename}/ resolution as remote peers (the
-    // mention taxonomy is a "people" taxonomy via the tc_taxonomy_peer_authors filter).
+    // mention taxonomy is a "people" taxonomy via the tconn_taxonomy_peer_authors filter).
     $types['local_site'] = array(
         'slug'             => 'local_site',
         'label'            => __( 'Local site', 'termconnect-social' ),
@@ -175,7 +175,7 @@ function tcs_register_link_types( array $types ): array {
  * @param string      $taxonomy Local taxonomy slug.
  * @return string|null
  */
-function tcs_filter_link_uri( ?string $uri, string $slug, string $id, array $type, string $taxonomy ): ?string {
+function tcsoc_filter_link_uri( ?string $uri, string $slug, string $id, array $type, string $taxonomy ): ?string {
     // "Local site" resolves to the local author archive for the stored nicename.
     if ( 'local_site' === $slug ) {
         $user = get_user_by( 'slug', $id );
@@ -185,7 +185,7 @@ function tcs_filter_link_uri( ?string $uri, string $slug, string $id, array $typ
         return $uri;
     }
     $network = substr( $slug, 7 );
-    return tcs_build_network_url( $network, $id, $taxonomy );
+    return tcsoc_build_network_url( $network, $id, $taxonomy );
 }
 
 /**
@@ -205,7 +205,7 @@ function tcs_filter_link_uri( ?string $uri, string $slug, string $id, array $typ
  * @param string     $taxonomy Taxonomy of the term being edited, if known.
  * @return array|null
  */
-function tcs_suggest_config( $config, string $slug, $type = null, string $taxonomy = '' ) {
+function tcsoc_suggest_config( $config, string $slug, $type = null, string $taxonomy = '' ) {
     if ( null !== $config || 0 !== strpos( $slug, 'social_' ) ) {
         return $config;
     }
@@ -221,13 +221,13 @@ function tcs_suggest_config( $config, string $slug, $type = null, string $taxono
         case 'github':
             return array(
                 'url'       => 'https://api.github.com/search/users?q={query}&per_page=8',
-                'parser'    => 'tcs_github',
+                'parser'    => 'tcsoc_github',
                 'free_text' => true,
             );
         case 'bluesky':
             return array(
                 'url'       => 'https://public.api.bsky.app/xrpc/app.bsky.actor.searchActorsTypeahead?q={query}&limit=8',
-                'parser'    => 'tcs_bluesky',
+                'parser'    => 'tcsoc_bluesky',
                 'free_text' => true,
             );
     }
@@ -246,8 +246,8 @@ function tcs_suggest_config( $config, string $slug, $type = null, string $taxono
  * @param string  $parser  Parser id.
  * @return array[]
  */
-function tcs_parse_suggest_response( array $results, string $body, string $parser ): array {
-    if ( 'tcs_github' !== $parser && 'tcs_bluesky' !== $parser ) {
+function tcsoc_parse_suggest_response( array $results, string $body, string $parser ): array {
+    if ( 'tcsoc_github' !== $parser && 'tcsoc_bluesky' !== $parser ) {
         return $results;
     }
 
@@ -258,7 +258,7 @@ function tcs_parse_suggest_response( array $results, string $body, string $parse
 
     $out = array();
 
-    if ( 'tcs_github' === $parser ) {
+    if ( 'tcsoc_github' === $parser ) {
         foreach ( (array) ( $data['items'] ?? array() ) as $item ) {
             $login = (string) ( $item['login'] ?? '' );
             if ( '' !== $login ) {
@@ -268,7 +268,7 @@ function tcs_parse_suggest_response( array $results, string $body, string $parse
         return $out;
     }
 
-    // tcs_bluesky
+    // tcsoc_bluesky
     foreach ( (array) ( $data['actors'] ?? array() ) as $actor ) {
         $handle = (string) ( $actor['handle'] ?? '' );
         if ( '' === $handle ) {

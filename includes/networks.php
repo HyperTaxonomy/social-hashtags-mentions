@@ -32,12 +32,12 @@ if ( ! defined( 'ABSPATH' ) ) {
  *                   where the mention handle is 'user@host' and the URL is host/@user.
  *  - internal     : (optional) true for the Blogosphere pseudo-network (local target).
  *
- * Third parties may add or modify networks via the `tcs_network_registry` filter.
+ * Third parties may add or modify networks via the `tcsoc_network_registry` filter.
  *
  * @since 1.0.0
  * @return array[] [ slug => definition ]
  */
-function tcs_get_network_registry(): array {
+function tcsoc_get_network_registry(): array {
     // Keyed by blog ID so any multisite caller that switch_to_blog()s between
     // sites within one request (the plugin's own uninstall.php iterates sites
     // this way, and third-party tooling may do the same) never gets served a
@@ -216,7 +216,7 @@ function tcs_get_network_registry(): array {
      * @since 1.0.0
      * @param array[] $registry [ slug => definition ]
      */
-    $registry = apply_filters( 'tcs_network_registry', $registry );
+    $registry = apply_filters( 'tcsoc_network_registry', $registry );
 
     // Hashtags are the primary feature, so group networks that support hashtags
     // above mention-only ones. The split is stable (PHP 7.4-safe), so the
@@ -244,8 +244,8 @@ function tcs_get_network_registry(): array {
  * @param string $slug Network slug (without the social_ prefix).
  * @return array|null
  */
-function tcs_get_network( string $slug ): ?array {
-    $registry = tcs_get_network_registry();
+function tcsoc_get_network( string $slug ): ?array {
+    $registry = tcsoc_get_network_registry();
     return $registry[ $slug ] ?? null;
 }
 
@@ -257,8 +257,8 @@ function tcs_get_network( string $slug ): ?array {
  * @param string $taxonomy Taxonomy slug.
  * @return bool
  */
-function tcs_network_supports( string $slug, string $taxonomy ): bool {
-    $def = tcs_get_network( $slug );
+function tcsoc_network_supports( string $slug, string $taxonomy ): bool {
+    $def = tcsoc_get_network( $slug );
     return $def && in_array( $taxonomy, (array) $def['supports'], true );
 }
 
@@ -268,7 +268,7 @@ function tcs_network_supports( string $slug, string $taxonomy ): bool {
  * @since 1.0.0
  * @return string[]
  */
-function tcs_taxonomies(): array {
+function tcsoc_taxonomies(): array {
     return array( 'hashtag', 'mention' );
 }
 
@@ -287,14 +287,14 @@ function tcs_taxonomies(): array {
  * @param string $extra_class Optional extra class on the wrapper.
  * @return string
  */
-function tcs_network_icon_html( string $slug, string $dashicon, string $color = '', string $extra_class = '' ): string {
-    $svg   = tcs_network_svg( $slug );
+function tcsoc_network_icon_html( string $slug, string $dashicon, string $color = '', string $extra_class = '' ): string {
+    $svg   = tcsoc_network_svg( $slug );
     // The SVG fills with currentColor and Dashicons are font glyphs, so a wrapper
     // text color tints either. Front-end/editor pass the brand color; admin omits it.
     $style = '' !== $color ? ' style="color:' . esc_attr( $color ) . '"' : '';
 
     if ( '' !== $svg ) {
-        $class = trim( 'tcs-icon ' . $extra_class );
+        $class = trim( 'tcsoc-icon ' . $extra_class );
         // First-party bundled asset; output inline so it inherits currentColor.
         return '<span class="' . esc_attr( $class ) . '"' . $style . ' aria-hidden="true">' . $svg . '</span>';
     }
@@ -311,7 +311,7 @@ function tcs_network_icon_html( string $slug, string $dashicon, string $color = 
  * @since 1.0.0
  * @return array wp_kses() allowlist.
  */
-function tcs_allowed_html(): array {
+function tcsoc_allowed_html(): array {
     $allowed         = wp_kses_allowed_html( 'post' );
     $allowed['svg']  = array( 'role' => true, 'viewbox' => true, 'xmlns' => true );
     $allowed['path'] = array( 'd' => true );
@@ -328,10 +328,10 @@ function tcs_allowed_html(): array {
  * @param string $slug Network slug.
  * @return string
  */
-function tcs_network_svg( string $slug ): string {
+function tcsoc_network_svg( string $slug ): string {
     static $cache = array();
     if ( ! array_key_exists( $slug, $cache ) ) {
-        $file           = TCS_PLUGIN_DIR . 'assets/icons/' . $slug . '.svg';
+        $file           = TCSOC_PLUGIN_DIR . 'assets/icons/' . $slug . '.svg';
         $cache[ $slug ] = is_readable( $file ) ? trim( (string) file_get_contents( $file ) ) : '';
     }
     return $cache[ $slug ];
@@ -347,7 +347,7 @@ function tcs_network_svg( string $slug ): string {
  * @param string $slug Network slug.
  * @return string
  */
-function tcs_network_color( string $slug ): string {
+function tcsoc_network_color( string $slug ): string {
     static $colors = array(
         'facebook'    => '#1877F2',
         'whatsapp'    => '#25D366',
@@ -392,8 +392,8 @@ function tcs_network_color( string $slug ): string {
  * @param string $taxonomy Taxonomy slug.
  * @return string|null
  */
-function tcs_build_network_url( string $slug, string $id, string $taxonomy ): ?string {
-    $def = tcs_get_network( $slug );
+function tcsoc_build_network_url( string $slug, string $id, string $taxonomy ): ?string {
+    $def = tcsoc_get_network( $slug );
     if ( ! $def || '' === $id || ! empty( $def['internal'] ) ) {
         return null;
     }

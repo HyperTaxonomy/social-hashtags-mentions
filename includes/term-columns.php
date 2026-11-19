@@ -27,17 +27,17 @@ if ( ! defined( 'ABSPATH' ) ) {
 // current_screen-gated registration would miss it and the new row's cell would be
 // blank until a full page reload. The taxonomy is bound per filter, so the
 // callbacks don't depend on get_current_screen().
-foreach ( tcs_taxonomies() as $tcs_tax ) {
+foreach ( tcsoc_taxonomies() as $tcsoc_tax ) {
     add_filter(
-        "manage_edit-{$tcs_tax}_columns",
-        static function ( $columns ) use ( $tcs_tax ) {
-            return tcs_add_term_column( (array) $columns, $tcs_tax );
+        "manage_edit-{$tcsoc_tax}_columns",
+        static function ( $columns ) use ( $tcsoc_tax ) {
+            return tcsoc_add_term_column( (array) $columns, $tcsoc_tax );
         },
         100
     );
-    add_filter( "manage_{$tcs_tax}_custom_column", 'tcs_render_term_column', 100, 3 );
+    add_filter( "manage_{$tcsoc_tax}_custom_column", 'tcsoc_render_term_column', 100, 3 );
 }
-add_action( 'admin_head', 'tcs_term_column_css' );
+add_action( 'admin_head', 'tcsoc_term_column_css' );
 
 /**
  * Inserts a column the same way TermConnect / As the Crow Flies do.
@@ -48,10 +48,10 @@ add_action( 'admin_head', 'tcs_term_column_css' );
  * @param string   $label   Column label.
  * @return string[]
  */
-function tcs_position_term_column( array $columns, string $key, string $label ): array {
+function tcsoc_position_term_column( array $columns, string $key, string $label ): array {
     if ( function_exists( 'htax_insert_column_after' ) ) {
-        $after = array_key_exists( 'tc_ext_links', $columns )
-            ? 'tc_ext_links'
+        $after = array_key_exists( 'tconn_ext_links', $columns )
+            ? 'tconn_ext_links'
             : ( array_key_exists( 'htax_hidden', $columns ) ? 'htax_hidden' : '' );
         if ( '' !== $after ) {
             return htax_insert_column_after( $columns, $after, $key, $label );
@@ -80,12 +80,12 @@ function tcs_position_term_column( array $columns, string $key, string $label ):
  * @param string   $taxonomy Taxonomy slug (bound per filter at registration).
  * @return string[]
  */
-function tcs_add_term_column( array $columns, string $taxonomy ): array {
+function tcsoc_add_term_column( array $columns, string $taxonomy ): array {
     if ( 'mention' === $taxonomy ) {
-        return tcs_position_term_column( $columns, 'tcs_profiles', __( 'Profiles', 'termconnect-social' ) );
+        return tcsoc_position_term_column( $columns, 'tcsoc_profiles', __( 'Profiles', 'termconnect-social' ) );
     }
     if ( 'hashtag' === $taxonomy ) {
-        return tcs_position_term_column( $columns, 'tcs_networks', __( 'Networks', 'termconnect-social' ) );
+        return tcsoc_position_term_column( $columns, 'tcsoc_networks', __( 'Networks', 'termconnect-social' ) );
     }
     return $columns;
 }
@@ -99,12 +99,12 @@ function tcs_add_term_column( array $columns, string $taxonomy ): array {
  * @param int    $term_id Term ID.
  * @return string
  */
-function tcs_render_term_column( $output, $column, $term_id ) {
-    if ( 'tcs_profiles' === $column ) {
-        return tcs_render_profiles_cell( (int) $term_id );
+function tcsoc_render_term_column( $output, $column, $term_id ) {
+    if ( 'tcsoc_profiles' === $column ) {
+        return tcsoc_render_profiles_cell( (int) $term_id );
     }
-    if ( 'tcs_networks' === $column ) {
-        return tcs_render_networks_cell( (int) $term_id );
+    if ( 'tcsoc_networks' === $column ) {
+        return tcsoc_render_networks_cell( (int) $term_id );
     }
     return $output;
 }
@@ -116,35 +116,35 @@ function tcs_render_term_column( $output, $column, $term_id ) {
  * @param int $term_id Term ID.
  * @return string
  */
-function tcs_render_profiles_cell( int $term_id ): string {
-    $links = function_exists( 'tc_get_term_links' ) ? tc_get_term_links( $term_id ) : array();
+function tcsoc_render_profiles_cell( int $term_id ): string {
+    $links = function_exists( 'tconn_get_term_links' ) ? tconn_get_term_links( $term_id ) : array();
 
     $items = array();
-    foreach ( tcs_get_enabled_networks( 'mention' ) as $slug ) {
+    foreach ( tcsoc_get_enabled_networks( 'mention' ) as $slug ) {
         $handle = (string) ( $links[ 'social_' . $slug ] ?? '' );
         if ( '' === $handle ) {
             continue;
         }
-        $def  = tcs_get_network( $slug );
+        $def  = tcsoc_get_network( $slug );
         if ( ! $def ) {
             continue;
         }
-        $icon  = tcs_network_icon_html( $slug, $def['icon'] ?? 'dashicons-admin-links' );
+        $icon  = tcsoc_network_icon_html( $slug, $def['icon'] ?? 'dashicons-admin-links' );
         $title = $def['label'] . ': ' . $handle;
-        $url   = tcs_build_network_url( $slug, $handle, 'mention' );
+        $url   = tcsoc_build_network_url( $slug, $handle, 'mention' );
         if ( null !== $url && '' !== $url ) {
-            $items[] = '<a class="tcs-col-icon" href="' . esc_url( $url ) . '" target="_blank" rel="noopener nofollow" title="' . esc_attr( $title ) . '">' . $icon . '</a>';
+            $items[] = '<a class="tcsoc-col-icon" href="' . esc_url( $url ) . '" target="_blank" rel="noopener nofollow" title="' . esc_attr( $title ) . '">' . $icon . '</a>';
         } else {
-            $items[] = '<span class="tcs-col-icon" title="' . esc_attr( $title ) . '">' . $icon . '</span>';
+            $items[] = '<span class="tcsoc-col-icon" title="' . esc_attr( $title ) . '">' . $icon . '</span>';
         }
     }
 
     if ( empty( $items ) ) {
         $edit = get_edit_term_link( $term_id );
-        return '<a class="tcs-col-add" href="' . esc_url( $edit ) . '#tc-external-links" aria-label="' . esc_attr__( 'Add profiles', 'termconnect-social' ) . '">+</a>';
+        return '<a class="tcsoc-col-add" href="' . esc_url( $edit ) . '#tconn-external-links" aria-label="' . esc_attr__( 'Add profiles', 'termconnect-social' ) . '">+</a>';
     }
 
-    return '<span class="tcs-col-icons">' . implode( '', $items ) . '</span>';
+    return '<span class="tcsoc-col-icons">' . implode( '', $items ) . '</span>';
 }
 
 /**
@@ -154,15 +154,15 @@ function tcs_render_profiles_cell( int $term_id ): string {
  * @param int $term_id Term ID.
  * @return string
  */
-function tcs_render_networks_cell( int $term_id ): string {
+function tcsoc_render_networks_cell( int $term_id ): string {
     $term = get_term( $term_id );
     if ( ! ( $term instanceof WP_Term ) ) {
         return '';
     }
 
     $items = array();
-    foreach ( tcs_get_enabled_networks( 'hashtag' ) as $slug ) {
-        $def = tcs_get_network( $slug );
+    foreach ( tcsoc_get_enabled_networks( 'hashtag' ) as $slug ) {
+        $def = tcsoc_get_network( $slug );
         if ( ! $def ) {
             continue;
         }
@@ -171,22 +171,22 @@ function tcs_render_networks_cell( int $term_id ): string {
             $url      = is_wp_error( $url ) ? '' : $url;
             $external = false;
         } else {
-            $url      = (string) tcs_build_network_url( $slug, $term->slug, 'hashtag' );
+            $url      = (string) tcsoc_build_network_url( $slug, $term->slug, 'hashtag' );
             $external = true;
         }
         if ( '' === $url ) {
             continue;
         }
-        $icon = tcs_network_icon_html( $slug, $def['icon'] ?? 'dashicons-admin-links' );
+        $icon = tcsoc_network_icon_html( $slug, $def['icon'] ?? 'dashicons-admin-links' );
         $rel  = $external ? ' target="_blank" rel="noopener nofollow"' : '';
-        $items[] = '<a class="tcs-col-icon" href="' . esc_url( $url ) . '"' . $rel . ' title="' . esc_attr( $def['label'] ) . '">' . $icon . '</a>';
+        $items[] = '<a class="tcsoc-col-icon" href="' . esc_url( $url ) . '"' . $rel . ' title="' . esc_attr( $def['label'] ) . '">' . $icon . '</a>';
     }
 
     if ( empty( $items ) ) {
-        return '<span class="tcs-col-empty">&mdash;</span>';
+        return '<span class="tcsoc-col-empty">&mdash;</span>';
     }
 
-    return '<span class="tcs-col-icons">' . implode( '', $items ) . '</span>';
+    return '<span class="tcsoc-col-icons">' . implode( '', $items ) . '</span>';
 }
 
 /**
@@ -194,24 +194,28 @@ function tcs_render_networks_cell( int $term_id ): string {
  *
  * @since 1.0.0
  */
-function tcs_term_column_css(): void {
+function tcsoc_term_column_css(): void {
     $screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
     if ( ! ( $screen instanceof WP_Screen ) || 'edit-tags' !== $screen->base
-        || ! in_array( (string) $screen->taxonomy, tcs_taxonomies(), true ) ) {
+        || ! in_array( (string) $screen->taxonomy, tcsoc_taxonomies(), true ) ) {
         return;
     }
     ?>
-    <style>
-    .column-tcs_profiles, .column-tcs_networks { width: 140px; }
-    .tcs-col-icons { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; }
-    .tcs-col-icon { color: #50575e; text-decoration: none; line-height: 1; display: inline-flex; }
-    .tcs-col-icon:hover, .tcs-col-icon:focus { color: #2271b1; }
-    .tcs-col-icon .tcs-icon { display: inline-flex; width: 18px; height: 18px; }
-    .tcs-col-icon .tcs-icon svg { width: 100%; height: 100%; fill: currentColor; }
-    .tcs-col-icon .dashicons { font-size: 18px; width: 18px; height: 18px; }
-    .tcs-col-add { color: #a7aaad; text-decoration: none; font-size: 18px; line-height: 1; }
-    .tcs-col-add:hover { color: #2271b1; }
-    .tcs-col-empty { color: #a7aaad; }
-    </style>
+    <?php ob_start(); ?>
+    .column-tcsoc_profiles, .column-tcsoc_networks { width: 140px; }
+    .tcsoc-col-icons { display: inline-flex; flex-wrap: wrap; gap: 4px; align-items: center; }
+    .tcsoc-col-icon { color: #50575e; text-decoration: none; line-height: 1; display: inline-flex; }
+    .tcsoc-col-icon:hover, .tcsoc-col-icon:focus { color: #2271b1; }
+    .tcsoc-col-icon .tcsoc-icon { display: inline-flex; width: 18px; height: 18px; }
+    .tcsoc-col-icon .tcsoc-icon svg { width: 100%; height: 100%; fill: currentColor; }
+    .tcsoc-col-icon .dashicons { font-size: 18px; width: 18px; height: 18px; }
+    .tcsoc-col-add { color: #a7aaad; text-decoration: none; font-size: 18px; line-height: 1; }
+    .tcsoc-col-add:hover { color: #2271b1; }
+    .tcsoc-col-empty { color: #a7aaad; }
+    <?php
+    wp_register_style( 'tcsoc-term-columns', false, array(), TCSOC_VERSION );
+    wp_add_inline_style( 'tcsoc-term-columns', wp_strip_all_tags( (string) ob_get_clean() ) );
+    wp_print_styles( 'tcsoc-term-columns' );
+    ?>
     <?php
 }

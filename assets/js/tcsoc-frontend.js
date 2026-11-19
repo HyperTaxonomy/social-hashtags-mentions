@@ -2,7 +2,7 @@
  * TermConnect Social — frontend pane behavior.
  *
  * A hashtag token that links to more than one network renders as a trigger
- * (.tcs-token--multi) with a sibling .tcs-pane. Clicking the trigger opens the
+ * (.tcsoc-token--multi) with a sibling .tcsoc-pane. Clicking the trigger opens the
  * pane; clicking elsewhere or pressing Escape closes any open pane. No-JS users
  * simply follow the token's fallback href (the local archive).
  */
@@ -10,21 +10,21 @@
 	'use strict';
 
 	function closeAll() {
-		document.querySelectorAll( '.tcs-pane:not([hidden])' ).forEach( function ( pane ) {
+		document.querySelectorAll( '.tcsoc-pane:not([hidden])' ).forEach( function ( pane ) {
 			pane.setAttribute( 'hidden', '' );
 		} );
-		document.querySelectorAll( '.tcs-token--multi[aria-expanded="true"]' ).forEach( function ( trigger ) {
+		document.querySelectorAll( '.tcsoc-token--multi[aria-expanded="true"]' ).forEach( function ( trigger ) {
 			trigger.setAttribute( 'aria-expanded', 'false' );
 		} );
 	}
 
 	document.addEventListener( 'click', function ( event ) {
-		var trigger = event.target.closest( '.tcs-token--multi' );
+		var trigger = event.target.closest( '.tcsoc-token--multi' );
 
 		if ( trigger ) {
 			event.preventDefault();
-			var wrap = trigger.closest( '.tcs-token-wrap' );
-			var pane = wrap ? wrap.querySelector( '.tcs-pane' ) : null;
+			var wrap = trigger.closest( '.tcsoc-token-wrap' );
+			var pane = wrap ? wrap.querySelector( '.tcsoc-pane' ) : null;
 			if ( ! pane ) {
 				return;
 			}
@@ -38,7 +38,7 @@
 		}
 
 		// A click inside an open pane should follow the link, not close prematurely.
-		if ( event.target.closest( '.tcs-pane' ) ) {
+		if ( event.target.closest( '.tcsoc-pane' ) ) {
 			return;
 		}
 

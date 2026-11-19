@@ -178,8 +178,8 @@ msgstr "Недопустимая таксономия."
 msgid "Invalid mention term."
 msgstr "Недопустимое упоминание (термин)."
 
-#: includes/taxonomies.php:48 assets/js/tcs-editor.js:651
-#: assets/js/tcs-editor.js:868
+#: includes/taxonomies.php:48 assets/js/tcsoc-editor.js:651
+#: assets/js/tcsoc-editor.js:868
 msgid "Hashtag"
 msgstr "Хештег"
 
@@ -203,8 +203,8 @@ msgstr "Просмотреть хештег"
 msgid "No hashtags found."
 msgstr "Хештеги не найдены."
 
-#: includes/taxonomies.php:74 assets/js/tcs-editor.js:832
-#: assets/js/tcs-editor.js:873
+#: includes/taxonomies.php:74 assets/js/tcsoc-editor.js:832
+#: assets/js/tcsoc-editor.js:873
 msgid "Mention"
 msgstr "Упоминание"
 
@@ -244,23 +244,23 @@ msgstr ""
 "TermConnect Social требует, чтобы плагин TermConnect был установлен "
 "и активен."
 
-#: assets/js/tcs-editor.js:666
+#: assets/js/tcsoc-editor.js:666
 msgid "Link this hashtag to:"
 msgstr "Связать этот хештег с:"
 
-#: assets/js/tcs-editor.js:669
+#: assets/js/tcsoc-editor.js:669
 msgid "No networks enabled."
 msgstr "Нет включённых социальных сетей."
 
-#: assets/js/tcs-editor.js:671 assets/js/tcs-editor.js:856
+#: assets/js/tcsoc-editor.js:671 assets/js/tcsoc-editor.js:856
 msgid "Apply"
 msgstr "Сохранить"
 
-#: assets/js/tcs-editor.js:847
+#: assets/js/tcsoc-editor.js:847
 msgid "Link this mention to:"
 msgstr "Связать это упоминание с:"
 
-#: assets/js/tcs-editor.js:853
+#: assets/js/tcsoc-editor.js:853
 msgid ""
 "No profiles are configured for this mention yet. Add them on the mention’s "
 "edit screen."
@@ -268,10 +268,10 @@ msgstr ""
 "Для этого упоминания ещё не настроено ни одного профиля. Добавьте их на "
 "странице редактирования упоминания."
 
-#: assets/js/tcs-editor.js:927 assets/js/tcs-editor.js:965
+#: assets/js/tcsoc-editor.js:927 assets/js/tcsoc-editor.js:965
 msgid "Create"
 msgstr "Создать"
 
-#: assets/js/tcs-editor.js:967
+#: assets/js/tcsoc-editor.js:967
 msgid "user"
 msgstr "пользователь"

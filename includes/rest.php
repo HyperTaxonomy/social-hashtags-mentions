@@ -18,7 +18,7 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-add_action( 'rest_api_init', 'tcs_register_rest_routes' );
+add_action( 'rest_api_init', 'tcsoc_register_rest_routes' );
 
 /**
  * Permission callback: any user who can edit posts.
@@ -26,7 +26,7 @@ add_action( 'rest_api_init', 'tcs_register_rest_routes' );
  * @since 1.0.0
  * @return bool
  */
-function tcs_rest_can_edit(): bool {
+function tcsoc_rest_can_edit(): bool {
     return current_user_can( 'edit_posts' );
 }
 
@@ -35,13 +35,13 @@ function tcs_rest_can_edit(): bool {
  *
  * @since 1.0.0
  */
-function tcs_register_rest_routes(): void {
+function tcsoc_register_rest_routes(): void {
     $ns = 'termconnect-social/v1';
 
     register_rest_route( $ns, '/terms', array(
         'methods'             => WP_REST_Server::READABLE,
-        'callback'            => 'tcs_rest_search_terms',
-        'permission_callback' => 'tcs_rest_can_edit',
+        'callback'            => 'tcsoc_rest_search_terms',
+        'permission_callback' => 'tcsoc_rest_can_edit',
         'args'                => array(
             'tax' => array( 'required' => true, 'type' => 'string' ),
             'q'   => array( 'required' => false, 'type' => 'string' ),
@@ -50,8 +50,8 @@ function tcs_register_rest_routes(): void {
 
     register_rest_route( $ns, '/users', array(
         'methods'             => WP_REST_Server::READABLE,
-        'callback'            => 'tcs_rest_search_users',
-        'permission_callback' => 'tcs_rest_can_edit',
+        'callback'            => 'tcsoc_rest_search_users',
+        'permission_callback' => 'tcsoc_rest_can_edit',
         'args'                => array(
             'q' => array( 'required' => false, 'type' => 'string' ),
         ),
@@ -59,11 +59,11 @@ function tcs_register_rest_routes(): void {
 
     register_rest_route( $ns, '/handles', array(
         'methods'             => WP_REST_Server::READABLE,
-        'callback'            => 'tcs_rest_get_handles',
+        'callback'            => 'tcsoc_rest_get_handles',
         // edit_posts, not edit_term: every author writing a mention needs the term's
         // handles for the editor's profile picker, and the handles are public anyway
         // (rendered with the mention on the front end).
-        'permission_callback' => 'tcs_rest_can_edit',
+        'permission_callback' => 'tcsoc_rest_can_edit',
         'args'                => array(
             'term_id' => array( 'required' => true, 'type' => 'integer' ),
         ),
@@ -77,9 +77,9 @@ function tcs_register_rest_routes(): void {
  * @param string $tax Raw taxonomy slug.
  * @return string|null
  */
-function tcs_rest_validate_tax( string $tax ): ?string {
+function tcsoc_rest_validate_tax( string $tax ): ?string {
     $tax = sanitize_key( $tax );
-    return in_array( $tax, tcs_taxonomies(), true ) ? $tax : null;
+    return in_array( $tax, tcsoc_taxonomies(), true ) ? $tax : null;
 }
 
 /**
@@ -89,7 +89,7 @@ function tcs_rest_validate_tax( string $tax ): ?string {
  * @param WP_Term $term Term.
  * @return array
  */
-function tcs_rest_term_payload( WP_Term $term ): array {
+function tcsoc_rest_term_payload( WP_Term $term ): array {
     $link = get_term_link( $term );
     return array(
         'id'   => $term->term_id,
@@ -106,10 +106,10 @@ function tcs_rest_term_payload( WP_Term $term ): array {
  * @param WP_REST_Request $request Request.
  * @return WP_REST_Response|WP_Error
  */
-function tcs_rest_search_terms( WP_REST_Request $request ) {
-    $tax = tcs_rest_validate_tax( (string) $request->get_param( 'tax' ) );
+function tcsoc_rest_search_terms( WP_REST_Request $request ) {
+    $tax = tcsoc_rest_validate_tax( (string) $request->get_param( 'tax' ) );
     if ( null === $tax ) {
-        return new WP_Error( 'tcs_bad_tax', __( 'Invalid taxonomy.', 'termconnect-social' ), array( 'status' => 400 ) );
+        return new WP_Error( 'tcsoc_bad_tax', __( 'Invalid taxonomy.', 'termconnect-social' ), array( 'status' => 400 ) );
     }
     $q = sanitize_text_field( (string) $request->get_param( 'q' ) );
 
@@ -127,7 +127,7 @@ function tcs_rest_search_terms( WP_REST_Request $request ) {
 
     $out = array();
     foreach ( $terms as $term ) {
-        $out[] = tcs_rest_term_payload( $term );
+        $out[] = tcsoc_rest_term_payload( $term );
     }
     return rest_ensure_response( $out );
 }
@@ -139,7 +139,7 @@ function tcs_rest_search_terms( WP_REST_Request $request ) {
  * @param WP_REST_Request $request Request.
  * @return WP_REST_Response
  */
-function tcs_rest_search_users( WP_REST_Request $request ) {
+function tcsoc_rest_search_users( WP_REST_Request $request ) {
     $q     = sanitize_text_field( (string) $request->get_param( 'q' ) );
     $users = get_users( array(
         'search'         => '' !== $q ? '*' . $q . '*' : '',
@@ -171,22 +171,22 @@ function tcs_rest_search_users( WP_REST_Request $request ) {
  * @param int $term_id Term ID.
  * @return array[] Each: { network, label, handle, icon }
  */
-function tcs_collect_handles( int $term_id ): array {
+function tcsoc_collect_handles( int $term_id ): array {
     $term = get_term( $term_id, 'mention' );
     if ( ! ( $term instanceof WP_Term ) ) {
         return array();
     }
-    $links = function_exists( 'tc_get_term_links' ) ? tc_get_term_links( $term_id ) : array();
+    $links = function_exists( 'tconn_get_term_links' ) ? tconn_get_term_links( $term_id ) : array();
     $out   = array();
 
     // Same order as the front end: settings order, with the Blogosphere subrange
     // (Local site + peers, in Peer Sites order) expanded in place.
-    foreach ( tcs_mention_universe( $term ) as $slug ) {
-        $def = tcs_get_network( $slug );
+    foreach ( tcsoc_mention_universe( $term ) as $slug ) {
+        $def = tcsoc_get_network( $slug );
         if ( $def && empty( $def['internal'] ) ) {
             // Show the handle (or "handle (Name)") — the icon identifies the network.
             $handle = (string) ( $links[ 'social_' . $slug ] ?? '' );
-            $name   = ( '' !== $handle ) ? tcs_link_name( $term_id, 'social_' . $slug, $handle ) : '';
+            $name   = ( '' !== $handle ) ? tcsoc_link_name( $term_id, 'social_' . $slug, $handle ) : '';
             $out[] = array(
                 'network' => $slug,
                 'label'   => ( '' !== $handle && '' !== $name ) ? $handle . ' (' . $name . ')' : $handle,
@@ -195,12 +195,12 @@ function tcs_collect_handles( int $term_id ): array {
             );
             continue;
         }
-        $type = function_exists( 'tc_get_link_type' ) ? tc_get_link_type( $slug ) : null;
+        $type = function_exists( 'tconn_get_link_type' ) ? tconn_get_link_type( $slug ) : null;
         if ( $type ) {
             // WordPress author profile: show "Name @ Site".
             $handle = (string) ( $links[ $slug ] ?? '' );
-            $name   = tcs_link_name( $term_id, $slug, $handle );
-            $site   = tcs_author_site_name( $slug, (string) ( $type['label'] ?? $slug ) );
+            $name   = tcsoc_link_name( $term_id, $slug, $handle );
+            $site   = tcsoc_author_site_name( $slug, (string) ( $type['label'] ?? $slug ) );
             $out[]  = array(
                 'network' => $slug,
                 'label'   => ( '' !== $name ? $name : $handle ) . ' @ ' . $site,
@@ -220,11 +220,11 @@ function tcs_collect_handles( int $term_id ): array {
  * @param WP_REST_Request $request Request.
  * @return WP_REST_Response|WP_Error
  */
-function tcs_rest_get_handles( WP_REST_Request $request ) {
+function tcsoc_rest_get_handles( WP_REST_Request $request ) {
     $term_id = (int) $request->get_param( 'term_id' );
     $term    = get_term( $term_id, 'mention' );
     if ( ! ( $term instanceof WP_Term ) ) {
-        return new WP_Error( 'tcs_bad_term', __( 'Invalid mention term.', 'termconnect-social' ), array( 'status' => 404 ) );
+        return new WP_Error( 'tcsoc_bad_term', __( 'Invalid mention term.', 'termconnect-social' ), array( 'status' => 404 ) );
     }
-    return rest_ensure_response( tcs_collect_handles( $term_id ) );
+    return rest_ensure_response( tcsoc_collect_handles( $term_id ) );
 }

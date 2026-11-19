@@ -28,7 +28,7 @@ for po in "$SRC"/languages/*-*.po; do
     msgfmt "$po" -o "${po%.po}.mo"
     base="$(basename "$po" .po)"        # e.g. termconnect-social-ru_RU
     locale="${base#${PLUGIN_SLUG}-}"    # e.g. ru_RU
-    EXTRA_HANDLES='tcs-editor=assets/js/tcs-editor.js' python "$SRC/utils/make-json.py" "$SRC" "$PLUGIN_SLUG" "$locale"
+    EXTRA_HANDLES='tcsoc-editor=assets/js/tcsoc-editor.js' python "$SRC/utils/make-json.py" "$SRC" "$PLUGIN_SLUG" "$locale"
 done
 echo ""
 

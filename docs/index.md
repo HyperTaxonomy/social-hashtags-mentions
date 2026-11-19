@@ -21,12 +21,6 @@ Part of the [HyperTaxonomy Suite](https://hypertaxonomy.org) of interoperable Wo
 
 The [User Guide](user-guide.html) covers each of these in full.
 
-## Documentation map
-
-- **[User Guide](user-guide.html)** — for site owners: settings and network ordering, the inline editor tokens, hashtag vs. mention rendering, mention handles, and the Blogosphere section and `[social_blogosphere]` shortcode.
-- **[Developer Reference](developer-reference.html)** — the network registry filter, REST endpoints, the TermConnect integration (link types, `tc_link_uri`, `tc_enabled_taxonomies`, peer author search), and how token markup maps to taxonomy terms.
-- **[Architecture](architecture/)** — for contributors: file structure and loading, function and hook references, and data storage.
-
 ## Requirements
 
 | Item | Version |
@@ -40,9 +34,15 @@ The [User Guide](user-guide.html) covers each of these in full.
 ## Getting started
 
 1. Install and activate **[TermConnect](https://hypertaxonomy.org/termconnect/)**.
-2. Install from the [WordPress.org plugin directory](https://wordpress.org/plugins/termconnect-social/), or download the zip from [GitHub Releases](https://github.com/HyperTaxonomy/termconnect-social/releases) and upload via **Plugins → Add New → Upload Plugin**, then activate it.
-3. Go to **Settings → TermConnect Social** to enable and order the networks you want.
+2. Install from the [WordPress.org plugin directory](https://wordpress.org/plugins/termconnect-social/), or download the zip from [GitHub Releases](https://github.com/HyperTaxonomy/termconnect-social/releases) and upload via **Plugins&nbsp;→ Add New&nbsp;→ Upload Plugin**, then activate it.
+3. Go to **Settings&nbsp;→ TermConnect Social** to enable and order the networks you want.
 4. In a post, type `#` followed by a word and pick or create the hashtag. Save, and the post gets that hashtag term; view the post to see the token's links.
+
+## Documentation map
+
+- **[User Guide](user-guide.html)** — for site owners: settings and network ordering, the inline editor tokens, hashtag vs. mention rendering, mention handles, and the Blogosphere section and `[social_blogosphere]` shortcode.
+- **[Developer Reference](developer-reference.html)** — the network registry filter, REST endpoints, the TermConnect integration (link types, `tconn_link_uri`, `tconn_enabled_taxonomies`, peer author search), and how token markup maps to taxonomy terms.
+- **[Architecture](architecture/)** — for contributors: file structure and loading, function and hook references, and data storage.
 
 ## External services
 

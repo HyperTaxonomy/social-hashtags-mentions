@@ -3,7 +3,7 @@
 Drop a brand SVG here named `{network-slug}.svg` (e.g. `mastodon.svg`, `bluesky.svg`,
 `livejournal.svg`) and it is used automatically wherever that network's icon renders —
 the front-end multilink pane, mention badges, and the admin settings list — via
-`tcs_network_icon_html()` in `includes/networks.php`. When no SVG is present for a slug,
+`tcsoc_network_icon_html()` in `includes/networks.php`. When no SVG is present for a slug,
 the network's Dashicon (set in the registry) is used instead.
 
 Slugs match the registry keys in `includes/networks.php`: `x`, `mastodon`, `bluesky`,

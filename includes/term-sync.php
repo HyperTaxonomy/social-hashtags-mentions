@@ -7,7 +7,7 @@
  * content is the single source of truth for which terms a post carries.
  *
  * Tokens are anchors the editor produces, e.g.:
- *   <a class="tcs-token tcs-hashtag" data-tcs-tax="hashtag" data-tcs-term="12"
+ *   <a class="tcsoc-token tcsoc-hashtag" data-tcs-tax="hashtag" data-tcs-term="12"
  *      data-tcs-networks="*" href="...">#example</a>
  *
  * An anchor may carry data-tcs-term (an existing term ID) or, for a freshly
@@ -29,10 +29,10 @@ if ( ! defined( 'ABSPATH' ) ) {
  *
  * @since 1.0.0
  */
-const TCS_ANCHOR_TAG_REGEX = '/<a\b((?:[^>"\']|"[^"]*"|\'[^\']*\')*)>(.*?)<\/a>/is';
+const TCSOC_ANCHOR_TAG_REGEX = '/<a\b((?:[^>"\']|"[^"]*"|\'[^\']*\')*)>(.*?)<\/a>/is';
 
-add_action( 'save_post', 'tcs_sync_post_terms', 20, 2 );
-add_filter( 'wp_kses_allowed_html', 'tcs_kses_allowed_html', 10, 2 );
+add_action( 'save_post', 'tcsoc_sync_post_terms', 20, 2 );
+add_filter( 'wp_kses_allowed_html', 'tcsoc_kses_allowed_html', 10, 2 );
 
 /**
  * Whitelists this plugin's data-tcs-* token attributes on <a> tags for the
@@ -49,7 +49,7 @@ add_filter( 'wp_kses_allowed_html', 'tcs_kses_allowed_html', 10, 2 );
  * @param string|array $context Kses context name, or an allowed-tags array.
  * @return array
  */
-function tcs_kses_allowed_html( $tags, $context ) {
+function tcsoc_kses_allowed_html( $tags, $context ) {
     if ( 'post' !== $context || ! is_array( $tags ) || ! isset( $tags['a'] ) || ! is_array( $tags['a'] ) ) {
         return $tags;
     }
@@ -66,20 +66,20 @@ function tcs_kses_allowed_html( $tags, $context ) {
  * @param int     $post_id Post ID.
  * @param WP_Post $post    Post object.
  */
-function tcs_sync_post_terms( int $post_id, $post ): void {
+function tcsoc_sync_post_terms( int $post_id, $post ): void {
     if ( ! ( $post instanceof WP_Post ) ) {
         return;
     }
     if ( wp_is_post_revision( $post_id ) || wp_is_post_autosave( $post_id ) ) {
         return;
     }
-    if ( ! in_array( $post->post_type, tcs_token_post_types(), true ) ) {
+    if ( ! in_array( $post->post_type, tcsoc_token_post_types(), true ) ) {
         return;
     }
 
-    $tokens = tcs_extract_tokens( (string) $post->post_content );
+    $tokens = tcsoc_extract_tokens( (string) $post->post_content );
 
-    foreach ( tcs_taxonomies() as $taxonomy ) {
+    foreach ( tcsoc_taxonomies() as $taxonomy ) {
         $ids = array();
         foreach ( $tokens as $token ) {
             if ( $token['tax'] !== $taxonomy ) {
@@ -94,7 +94,7 @@ function tcs_sync_post_terms( int $post_id, $post ): void {
                 }
             }
             if ( '' !== $token['name'] ) {
-                $created = tcs_get_or_create_term( $token['name'], $taxonomy, $token['user_id'] );
+                $created = tcsoc_get_or_create_term( $token['name'], $taxonomy, $token['user_id'] );
                 if ( $created > 0 ) {
                     $ids[] = $created;
                 }
@@ -112,34 +112,34 @@ function tcs_sync_post_terms( int $post_id, $post ): void {
  * @param string $content Post content HTML.
  * @return array[] Each: { tax: string, id: int, name: string, text: string }
  */
-function tcs_extract_tokens( string $content ): array {
+function tcsoc_extract_tokens( string $content ): array {
     $tokens = array();
     if ( false === strpos( $content, 'data-tcs-tax' ) ) {
         return $tokens;
     }
 
-    if ( ! preg_match_all( TCS_ANCHOR_TAG_REGEX, $content, $matches, PREG_SET_ORDER ) ) {
+    if ( ! preg_match_all( TCSOC_ANCHOR_TAG_REGEX, $content, $matches, PREG_SET_ORDER ) ) {
         return $tokens;
     }
 
     foreach ( $matches as $match ) {
         $attrs = $match[1];
-        $tax   = tcs_token_attr( $attrs, 'data-tcs-tax' );
-        if ( ! in_array( $tax, tcs_taxonomies(), true ) ) {
+        $tax   = tcsoc_token_attr( $attrs, 'data-tcs-tax' );
+        if ( ! in_array( $tax, tcsoc_taxonomies(), true ) ) {
             continue;
         }
         $text = trim( wp_strip_all_tags( $match[2] ) );
-        $name = tcs_token_attr( $attrs, 'data-tcs-name' );
+        $name = tcsoc_token_attr( $attrs, 'data-tcs-name' );
         if ( '' === $name ) {
             // Fall back to the visible label, minus the leading # or @.
             $name = ltrim( $text, '#@' );
         }
         $tokens[] = array(
             'tax'     => $tax,
-            'id'      => (int) tcs_token_attr( $attrs, 'data-tcs-term' ),
+            'id'      => (int) tcsoc_token_attr( $attrs, 'data-tcs-term' ),
             'name'    => $name,
             'text'    => $text,
-            'user_id' => (int) tcs_token_attr( $attrs, 'data-tcs-user-id' ),
+            'user_id' => (int) tcsoc_token_attr( $attrs, 'data-tcs-user-id' ),
         );
     }
 
@@ -154,7 +154,7 @@ function tcs_extract_tokens( string $content ): array {
  * @param string $name  Attribute name.
  * @return string Unescaped value, or '' if absent.
  */
-function tcs_token_attr( string $attrs, string $name ): string {
+function tcsoc_token_attr( string $attrs, string $name ): string {
     // (?<=^|\s): the name must start right after whitespace or the start of the
     // attribute list, not just any word-boundary — so "data-evil-data-tcs-tax" can't
     // be misread as "data-tcs-tax" the way a generic \b boundary would allow.
@@ -170,7 +170,7 @@ function tcs_token_attr( string $attrs, string $name ): string {
  *
  * When $user_id is given (a mention picked from the @ autocomplete's local-user
  * results), the term is resolved/claimed by that user's identity first — via the
- * `_tcs_user_id` term meta set by tcs_set_term_user_link() — rather than by name text
+ * `_tcsoc_user_id` term meta set by tcsoc_set_term_user_link() — rather than by name text
  * alone, so two different users who happen to share a display name are never
  * silently merged into one mention term.
  *
@@ -180,7 +180,7 @@ function tcs_token_attr( string $attrs, string $name ): string {
  * @param int    $user_id  Optional WordPress user ID this mention resolved to.
  * @return int Term ID, or 0 on failure.
  */
-function tcs_get_or_create_term( string $name, string $taxonomy, int $user_id = 0 ): int {
+function tcsoc_get_or_create_term( string $name, string $taxonomy, int $user_id = 0 ): int {
     $name = trim( $name );
     if ( '' === $name ) {
         return 0;
@@ -190,12 +190,12 @@ function tcs_get_or_create_term( string $name, string $taxonomy, int $user_id = 
     // trust it when it names a real user whose name matches the mention text (always
     // true for a pick from the @ autocomplete); otherwise resolve by name alone, so a
     // token can't claim another person's mention term or point it at a different user.
-    if ( $user_id > 0 && ! tcs_user_matches_mention_name( $user_id, $name ) ) {
+    if ( $user_id > 0 && ! tcsoc_user_matches_mention_name( $user_id, $name ) ) {
         $user_id = 0;
     }
 
     if ( $user_id > 0 && 'mention' === $taxonomy ) {
-        $linked_term_id = tcs_get_term_by_user_id( $user_id );
+        $linked_term_id = tcsoc_get_term_by_user_id( $user_id );
         if ( $linked_term_id > 0 ) {
             return $linked_term_id;
         }
@@ -209,11 +209,11 @@ function tcs_get_or_create_term( string $name, string $taxonomy, int $user_id = 
             return $term_id;
         }
 
-        $linked_user = (int) get_term_meta( $term_id, '_tcs_user_id', true );
+        $linked_user = (int) get_term_meta( $term_id, '_tcsoc_user_id', true );
         if ( 0 === $linked_user ) {
             // An untagged term that happens to share this user's display name —
             // claim it for them.
-            tcs_set_term_user_link( $term_id, $user_id );
+            tcsoc_set_term_user_link( $term_id, $user_id );
             return $term_id;
         }
         if ( $linked_user === $user_id ) {
@@ -223,16 +223,16 @@ function tcs_get_or_create_term( string $name, string $taxonomy, int $user_id = 
         // The name collides with a different user's already-linked term. WordPress
         // itself forbids two terms with the same name in a flat taxonomy, so create
         // a distinctly-named term instead of silently reassigning their link.
-        $name = tcs_disambiguate_term_name( $name, $user_id );
+        $name = tcsoc_disambiguate_term_name( $name, $user_id );
         $existing = term_exists( $name, $taxonomy );
         if ( $existing ) {
             $term_id = (int) ( is_array( $existing ) ? $existing['term_id'] : $existing );
 
             // Same ownership check as above, mirrored: never silently reassign a term
             // already linked to a different user, even at the disambiguated name.
-            $linked_user = (int) get_term_meta( $term_id, '_tcs_user_id', true );
+            $linked_user = (int) get_term_meta( $term_id, '_tcsoc_user_id', true );
             if ( 0 === $linked_user || $linked_user === $user_id ) {
-                tcs_set_term_user_link( $term_id, $user_id );
+                tcsoc_set_term_user_link( $term_id, $user_id );
                 return $term_id;
             }
             // Linked to a different user: use the term by name, but never relink it.
@@ -253,7 +253,7 @@ function tcs_get_or_create_term( string $name, string $taxonomy, int $user_id = 
     }
 
     if ( $term_id > 0 && $user_id > 0 && 'mention' === $taxonomy ) {
-        tcs_set_term_user_link( $term_id, $user_id );
+        tcsoc_set_term_user_link( $term_id, $user_id );
     }
 
     return $term_id;
@@ -266,7 +266,7 @@ function tcs_get_or_create_term( string $name, string $taxonomy, int $user_id = 
  * @param int $user_id WordPress user ID.
  * @return int Term ID, or 0 if none.
  */
-function tcs_get_term_by_user_id( int $user_id ): int {
+function tcsoc_get_term_by_user_id( int $user_id ): int {
     $terms = get_terms( array(
         'taxonomy'   => 'mention',
         'hide_empty' => false,
@@ -274,7 +274,7 @@ function tcs_get_term_by_user_id( int $user_id ): int {
         'fields'     => 'ids',
         'meta_query' => array(
             array(
-                'key'   => '_tcs_user_id',
+                'key'   => '_tcsoc_user_id',
                 'value' => $user_id,
             ),
         ),
@@ -291,7 +291,7 @@ function tcs_get_term_by_user_id( int $user_id ): int {
  * @param int    $user_id WordPress user ID the new term is for.
  * @return string
  */
-function tcs_disambiguate_term_name( string $name, int $user_id ): string {
+function tcsoc_disambiguate_term_name( string $name, int $user_id ): string {
     $user = get_user_by( 'id', $user_id );
     $tag  = $user ? $user->user_nicename : (string) $user_id;
     return $name . ' (' . $tag . ')';
@@ -308,7 +308,7 @@ function tcs_disambiguate_term_name( string $name, int $user_id ): string {
  * @param string $name    Mention text from the token.
  * @return bool
  */
-function tcs_user_matches_mention_name( int $user_id, string $name ): bool {
+function tcsoc_user_matches_mention_name( int $user_id, string $name ): bool {
     $user = get_user_by( 'id', $user_id );
     if ( ! $user ) {
         return false;
@@ -333,19 +333,19 @@ function tcs_user_matches_mention_name( int $user_id, string $name ): bool {
  * @param int $term_id Term ID.
  * @param int $user_id WordPress user ID.
  */
-function tcs_set_term_user_link( int $term_id, int $user_id ): void {
-    update_term_meta( $term_id, '_tcs_user_id', $user_id );
+function tcsoc_set_term_user_link( int $term_id, int $user_id ): void {
+    update_term_meta( $term_id, '_tcsoc_user_id', $user_id );
 
-    if ( ! function_exists( 'tc_set_term_link' ) ) {
+    if ( ! function_exists( 'tconn_set_term_link' ) ) {
         return;
     }
     $user = get_user_by( 'id', $user_id );
     if ( ! $user ) {
         return;
     }
-    $existing = function_exists( 'tc_get_term_links' ) ? tc_get_term_links( $term_id ) : array();
+    $existing = function_exists( 'tconn_get_term_links' ) ? tconn_get_term_links( $term_id ) : array();
     if ( '' !== (string) ( $existing['local_site'] ?? '' ) ) {
         return; // Already linked (e.g. set manually on the term edit screen) — don't override.
     }
-    tc_set_term_link( $term_id, 'local_site', $user->user_nicename, $user->display_name );
+    tconn_set_term_link( $term_id, 'local_site', $user->user_nicename, $user->display_name );
 }

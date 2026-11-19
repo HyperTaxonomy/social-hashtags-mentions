@@ -23,26 +23,26 @@ if ( ! defined( 'ABSPATH' ) ) {
     exit;
 }
 
-add_filter( 'the_content', 'tcs_render_tokens', 20 );
-add_action( 'wp_enqueue_scripts', 'tcs_enqueue_frontend_assets' );
+add_filter( 'the_content', 'tcsoc_render_tokens', 20 );
+add_action( 'wp_enqueue_scripts', 'tcsoc_enqueue_frontend_assets' );
 
 /**
  * Enqueues the frontend stylesheet for token badges and the Blogosphere section.
  *
  * @since 1.0.0
  */
-function tcs_enqueue_frontend_assets(): void {
+function tcsoc_enqueue_frontend_assets(): void {
     wp_enqueue_style(
         'termconnect-social',
-        TCS_PLUGIN_URL . 'assets/css/termconnect-social.css',
+        TCSOC_PLUGIN_URL . 'assets/css/termconnect-social.css',
         array( 'dashicons' ),
-        TCS_VERSION
+        TCSOC_VERSION
     );
     wp_enqueue_script(
         'termconnect-social',
-        TCS_PLUGIN_URL . 'assets/js/tcs-frontend.js',
+        TCSOC_PLUGIN_URL . 'assets/js/tcsoc-frontend.js',
         array(),
-        TCS_VERSION,
+        TCSOC_VERSION,
         true
     );
 }
@@ -54,7 +54,7 @@ function tcs_enqueue_frontend_assets(): void {
  * @param string $content Post content.
  * @return string
  */
-function tcs_render_tokens( string $content ): string {
+function tcsoc_render_tokens( string $content ): string {
     if ( false === strpos( $content, 'data-tcs-tax' ) ) {
         return $content;
     }
@@ -67,8 +67,8 @@ function tcs_render_tokens( string $content ): string {
     }
 
     return (string) preg_replace_callback(
-        TCS_ANCHOR_TAG_REGEX,
-        'tcs_render_token_callback',
+        TCSOC_ANCHOR_TAG_REGEX,
+        'tcsoc_render_token_callback',
         $content
     );
 }
@@ -80,7 +80,7 @@ function tcs_render_tokens( string $content ): string {
  * @param array $match [ full, attrs, inner ]
  * @return string
  */
-function tcs_render_token_callback( array $match ): string {
+function tcsoc_render_token_callback( array $match ): string {
     $attrs = $match[1];
     $inner = $match[2];
 
@@ -90,31 +90,31 @@ function tcs_render_token_callback( array $match ): string {
 
     // Idempotency guard: skip anchors already processed, so a second the_content
     // pass (excerpt builders, page builders, etc.) doesn't duplicate badges/panes.
-    if ( false !== strpos( $attrs, 'tcs-rendered' ) ) {
+    if ( false !== strpos( $attrs, 'tcsoc-rendered' ) ) {
         return $match[0];
     }
 
-    $taxonomy = tcs_token_attr( $attrs, 'data-tcs-tax' );
-    if ( ! in_array( $taxonomy, tcs_taxonomies(), true ) ) {
+    $taxonomy = tcsoc_token_attr( $attrs, 'data-tcs-tax' );
+    if ( ! in_array( $taxonomy, tcsoc_taxonomies(), true ) ) {
         return $match[0];
     }
 
-    $term = tcs_resolve_token_term( $attrs, $taxonomy );
+    $term = tcsoc_resolve_token_term( $attrs, $taxonomy );
     if ( ! ( $term instanceof WP_Term ) ) {
         return $match[0];
     }
 
     $universe = ( 'hashtag' === $taxonomy )
-        ? tcs_get_enabled_networks( 'hashtag' )
-        : tcs_mention_universe( $term );
-    $selected = tcs_token_selected_networks( $attrs, $universe );
-    $attrs    = tcs_add_class( $attrs, 'tcs-rendered' );
+        ? tcsoc_get_enabled_networks( 'hashtag' )
+        : tcsoc_mention_universe( $term );
+    $selected = tcsoc_token_selected_networks( $attrs, $universe );
+    $attrs    = tcsoc_add_class( $attrs, 'tcsoc-rendered' );
 
     if ( 'hashtag' === $taxonomy ) {
-        return tcs_render_hashtag_token( $attrs, $inner, $term, $selected );
+        return tcsoc_render_hashtag_token( $attrs, $inner, $term, $selected );
     }
 
-    return tcs_render_mention_token( $attrs, $inner, $term, $selected );
+    return tcsoc_render_mention_token( $attrs, $inner, $term, $selected );
 }
 
 /**
@@ -128,29 +128,29 @@ function tcs_render_token_callback( array $match ): string {
  * @param string[] $selected Ordered selected+enabled network slugs.
  * @return string
  */
-function tcs_render_hashtag_token( string $attrs, string $inner, WP_Term $term, array $selected ): string {
+function tcsoc_render_hashtag_token( string $attrs, string $inner, WP_Term $term, array $selected ): string {
     $archive = get_term_link( $term );
     $archive = is_wp_error( $archive ) ? '' : $archive;
 
-    $targets = tcs_hashtag_targets( $term, $selected, $archive );
+    $targets = tcsoc_hashtag_targets( $term, $selected, $archive );
 
     // No enabled links: link to the archive or render as plain text, per setting.
     if ( empty( $targets ) ) {
-        return tcs_render_untargeted_token( $attrs, $inner, $archive, 'hashtag' );
+        return tcsoc_render_untargeted_token( $attrs, $inner, $archive, 'hashtag' );
     }
 
     // Exactly one target: the token links directly to it.
     if ( 1 === count( $targets ) ) {
         $t     = $targets[0];
-        $attrs = tcs_set_attr( $attrs, 'href', $t['url'] );
+        $attrs = tcsoc_set_attr( $attrs, 'href', $t['url'] );
         if ( $t['external'] ) {
-            $attrs = tcs_external_link_attrs( $attrs );
+            $attrs = tcsoc_external_link_attrs( $attrs );
         }
         return '<a' . $attrs . '>' . $inner . '</a>';
     }
 
     // Multiple targets: the token opens a pane listing them.
-    return tcs_render_multi_target_token( $attrs, $inner, $targets, $archive, static fn( array $t ): string => esc_html( $t['label'] ) );
+    return tcsoc_render_multi_target_token( $attrs, $inner, $targets, $archive, static fn( array $t ): string => esc_html( $t['label'] ) );
 }
 
 /**
@@ -165,10 +165,10 @@ function tcs_render_hashtag_token( string $attrs, string $inner, WP_Term $term, 
  * @param string   $archive  Local archive URL (may be '').
  * @return array[] Each: { url, label, icon, slug, external }
  */
-function tcs_hashtag_targets( WP_Term $term, array $selected, string $archive ): array {
+function tcsoc_hashtag_targets( WP_Term $term, array $selected, string $archive ): array {
     $targets = array();
     foreach ( $selected as $slug ) {
-        $def = tcs_get_network( $slug );
+        $def = tcsoc_get_network( $slug );
         if ( ! $def ) {
             continue;
         }
@@ -179,7 +179,7 @@ function tcs_hashtag_targets( WP_Term $term, array $selected, string $archive ):
             $url      = $archive;
             $external = false;
         } else {
-            $url      = tcs_build_network_url( $slug, $term->slug, 'hashtag' );
+            $url      = tcsoc_build_network_url( $slug, $term->slug, 'hashtag' );
             $external = true;
         }
         if ( null === $url || '' === $url ) {
@@ -204,15 +204,15 @@ function tcs_hashtag_targets( WP_Term $term, array $selected, string $archive ):
  * @param string $taxonomy Taxonomy slug.
  * @return WP_Term|null
  */
-function tcs_resolve_token_term( string $attrs, string $taxonomy ): ?WP_Term {
-    $id = (int) tcs_token_attr( $attrs, 'data-tcs-term' );
+function tcsoc_resolve_token_term( string $attrs, string $taxonomy ): ?WP_Term {
+    $id = (int) tcsoc_token_attr( $attrs, 'data-tcs-term' );
     if ( $id > 0 ) {
         $term = get_term( $id, $taxonomy );
         if ( $term instanceof WP_Term ) {
             return $term;
         }
     }
-    $name = tcs_token_attr( $attrs, 'data-tcs-name' );
+    $name = tcsoc_token_attr( $attrs, 'data-tcs-name' );
     if ( '' !== $name ) {
         $existing = term_exists( $name, $taxonomy );
         if ( $existing ) {
@@ -235,8 +235,8 @@ function tcs_resolve_token_term( string $attrs, string $taxonomy ): ?WP_Term {
  * @param string[] $universe Ordered selectable item slugs for this token.
  * @return string[]
  */
-function tcs_token_selected_networks( string $attrs, array $universe ): array {
-    $raw = trim( tcs_token_attr( $attrs, 'data-tcs-networks' ) );
+function tcsoc_token_selected_networks( string $attrs, array $universe ): array {
+    $raw = trim( tcsoc_token_attr( $attrs, 'data-tcs-networks' ) );
 
     if ( '' === $raw || '*' === $raw ) {
         return $universe;
@@ -257,12 +257,12 @@ function tcs_token_selected_networks( string $attrs, array $universe ): array {
  * @param WP_Term $term Mention term.
  * @return string[]
  */
-function tcs_mention_universe( WP_Term $term ): array {
-    $enabled = tcs_get_enabled_networks( 'mention' ); // admin-defined settings order
+function tcsoc_mention_universe( WP_Term $term ): array {
+    $enabled = tcsoc_get_enabled_networks( 'mention' ); // admin-defined settings order
 
     // The Blogosphere subrange: local profile first, then peers in Peer Sites order.
-    $authors = ( in_array( 'blogosphere', $enabled, true ) && function_exists( 'tc_get_term_links' ) )
-        ? tcs_term_wp_author_slugs( tc_get_term_links( $term->term_id ) )
+    $authors = ( in_array( 'blogosphere', $enabled, true ) && function_exists( 'tconn_get_term_links' ) )
+        ? tcsoc_term_wp_author_slugs( tconn_get_term_links( $term->term_id ) )
         : array();
 
     $universe = array();
@@ -274,7 +274,7 @@ function tcs_mention_universe( WP_Term $term ): array {
             }
             continue;
         }
-        $def = tcs_get_network( $slug );
+        $def = tcsoc_get_network( $slug );
         if ( $def && empty( $def['internal'] ) ) {
             $universe[] = $slug;
         }
@@ -285,13 +285,13 @@ function tcs_mention_universe( WP_Term $term ): array {
 
 /**
  * The WordPress author profile link-type slugs set on a term — the "Local site"
- * first, then peer sites — from a tc_get_term_links() map.
+ * first, then peer sites — from a tconn_get_term_links() map.
  *
  * @since 1.0.0
  * @param array $links Term links keyed by slug.
  * @return string[]
  */
-function tcs_term_wp_author_slugs( array $links ): array {
+function tcsoc_term_wp_author_slugs( array $links ): array {
     $out = array();
 
     // Local profile first.
@@ -300,8 +300,8 @@ function tcs_term_wp_author_slugs( array $links ): array {
     }
 
     // Then peer sites, in the TermConnect Peer Sites admin order.
-    if ( function_exists( 'tc_get_platform_link_types' ) ) {
-        foreach ( tc_get_platform_link_types( 'wordpress' ) as $slug => $type ) {
+    if ( function_exists( 'tconn_get_platform_link_types' ) ) {
+        foreach ( tconn_get_platform_link_types( 'wordpress' ) as $slug => $type ) {
             if ( 'local_site' === $slug ) {
                 continue;
             }
@@ -328,7 +328,7 @@ function tcs_term_wp_author_slugs( array $links ): array {
  * @param string $handle  Stored handle/identifier.
  * @return string
  */
-function tcs_link_name( int $term_id, string $slug, string $handle ): string {
+function tcsoc_link_name( int $term_id, string $slug, string $handle ): string {
     // Local author: resolve the display name live (no parsing needed).
     if ( 'local_site' === $slug ) {
         $user = get_user_by( 'slug', $handle );
@@ -336,14 +336,14 @@ function tcs_link_name( int $term_id, string $slug, string $handle ): string {
         return ( '' !== $name && $name !== $handle ) ? $name : '';
     }
 
-    $meta  = get_term_meta( $term_id, '_tc_link_' . $slug, true );
+    $meta  = get_term_meta( $term_id, '_tconn_link_' . $slug, true );
     $label = is_array( $meta ) ? (string) ( $meta['label'] ?? '' ) : '';
     if ( '' === $label ) {
         return '';
     }
 
     // Strip the "{Type}: " prefix and a trailing " (handle)" group.
-    $type   = function_exists( 'tc_get_link_type' ) ? tc_get_link_type( $slug ) : null;
+    $type   = function_exists( 'tconn_get_link_type' ) ? tconn_get_link_type( $slug ) : null;
     $prefix = $type ? (string) ( $type['label'] ?? '' ) . ': ' : '';
     if ( '' !== $prefix && 0 === strpos( $label, $prefix ) ) {
         $label = substr( $label, strlen( $prefix ) );
@@ -369,22 +369,22 @@ function tcs_link_name( int $term_id, string $slug, string $handle ): string {
  * @param string[] $selected Ordered selected+enabled network slugs.
  * @return string
  */
-function tcs_render_mention_token( string $attrs, string $inner, WP_Term $term, array $selected ): string {
+function tcsoc_render_mention_token( string $attrs, string $inner, WP_Term $term, array $selected ): string {
     $archive = get_term_link( $term );
     $archive = is_wp_error( $archive ) ? '' : $archive;
 
-    $targets = tcs_mention_targets( $term, $selected );
+    $targets = tcsoc_mention_targets( $term, $selected );
 
     // No enabled links: link to the local archive (the local profile) or render
     // as plain text, per the setting.
     if ( empty( $targets ) ) {
-        return tcs_render_untargeted_token( $attrs, $inner, $archive, 'mention' );
+        return tcsoc_render_untargeted_token( $attrs, $inner, $archive, 'mention' );
     }
 
     // Exactly one target.
     if ( 1 === count( $targets ) ) {
         $t     = $targets[0];
-        $attrs = tcs_set_attr( $attrs, 'href', $t['url'] );
+        $attrs = tcsoc_set_attr( $attrs, 'href', $t['url'] );
 
         // A local-profile link keeps the @name text.
         if ( empty( $t['external'] ) ) {
@@ -392,15 +392,15 @@ function tcs_render_mention_token( string $attrs, string $inner, WP_Term $term, 
         }
 
         // An external profile renders inline as the network icon + handle.
-        $attrs = tcs_external_link_attrs( $attrs );
-        $attrs = tcs_add_class( $attrs, 'tcs-mention--inline' );
-        $label = tcs_network_icon_html( $t['slug'], $t['icon'], tcs_network_color( $t['slug'] ) )
-            . tcs_mention_label_html( $t );
+        $attrs = tcsoc_external_link_attrs( $attrs );
+        $attrs = tcsoc_add_class( $attrs, 'tcsoc-mention--inline' );
+        $label = tcsoc_network_icon_html( $t['slug'], $t['icon'], tcsoc_network_color( $t['slug'] ) )
+            . tcsoc_mention_label_html( $t );
         return '<a' . $attrs . '>' . $label . '</a>';
     }
 
     // Multiple targets: the @name opens a pane listing each icon + handle.
-    return tcs_render_multi_target_token( $attrs, $inner, $targets, $archive, 'tcs_mention_label_html' );
+    return tcsoc_render_multi_target_token( $attrs, $inner, $targets, $archive, 'tcsoc_mention_label_html' );
 }
 
 /**
@@ -412,15 +412,15 @@ function tcs_render_mention_token( string $attrs, string $inner, WP_Term $term, 
  *
  * @since 1.0.0
  * @param WP_Term  $term     Mention term.
- * @param string[] $selected Ordered selected item slugs (from tcs_mention_universe()).
+ * @param string[] $selected Ordered selected item slugs (from tcsoc_mention_universe()).
  * @return array[] Each: { url, label, icon, slug, handle, external }
  */
-function tcs_mention_targets( WP_Term $term, array $selected ): array {
-    $handles = function_exists( 'tc_get_term_links' ) ? tc_get_term_links( $term->term_id ) : array();
+function tcsoc_mention_targets( WP_Term $term, array $selected ): array {
+    $handles = function_exists( 'tconn_get_term_links' ) ? tconn_get_term_links( $term->term_id ) : array();
     $targets = array();
 
     foreach ( $selected as $slug ) {
-        $def = tcs_get_network( $slug );
+        $def = tcsoc_get_network( $slug );
 
         // Social network: link to the stored handle's profile.
         if ( $def && empty( $def['internal'] ) ) {
@@ -428,7 +428,7 @@ function tcs_mention_targets( WP_Term $term, array $selected ): array {
             if ( '' === $handle ) {
                 continue;
             }
-            $url = tcs_build_network_url( $slug, $handle, 'mention' );
+            $url = tcsoc_build_network_url( $slug, $handle, 'mention' );
             if ( null === $url || '' === $url ) {
                 continue;
             }
@@ -438,7 +438,7 @@ function tcs_mention_targets( WP_Term $term, array $selected ): array {
                 'icon'     => (string) ( $def['icon'] ?? 'dashicons-admin-links' ),
                 'slug'     => $slug,
                 'handle'   => $handle,
-                'name'     => tcs_link_name( $term->term_id, 'social_' . $slug, $handle ),
+                'name'     => tcsoc_link_name( $term->term_id, 'social_' . $slug, $handle ),
                 'author'   => false,
                 'external' => true,
             );
@@ -446,10 +446,10 @@ function tcs_mention_targets( WP_Term $term, array $selected ): array {
         }
 
         // WordPress author profile (Local site or peer).
-        if ( ! function_exists( 'tc_get_link_type' ) ) {
+        if ( ! function_exists( 'tconn_get_link_type' ) ) {
             continue;
         }
-        $lt = tc_get_link_type( $slug );
+        $lt = tconn_get_link_type( $slug );
         if ( ! $lt || 'wordpress' !== ( $lt['platform'] ?? '' ) ) {
             continue;
         }
@@ -457,22 +457,22 @@ function tcs_mention_targets( WP_Term $term, array $selected ): array {
         if ( '' === $id ) {
             continue;
         }
-        $url = function_exists( 'tc_get_link_uri' ) ? tc_get_link_uri( $slug, $id, 'mention' ) : null;
+        $url = function_exists( 'tconn_get_link_uri' ) ? tconn_get_link_uri( $slug, $id, 'mention' ) : null;
         if ( null === $url || '' === $url ) {
             continue;
         }
         $is_local = ( 'local_site' === $slug );
-        if ( ! $is_local && function_exists( 'tc_external_get_site_origin' ) && function_exists( 'tc_is_self_origin' ) ) {
-            $origin   = tc_external_get_site_origin( (string) ( $lt['uri_prefix'] ?? '' ) );
-            $is_local = ( '' !== $origin && tc_is_self_origin( $origin ) );
+        if ( ! $is_local && function_exists( 'tconn_external_get_site_origin' ) && function_exists( 'tconn_is_self_origin' ) ) {
+            $origin   = tconn_external_get_site_origin( (string) ( $lt['uri_prefix'] ?? '' ) );
+            $is_local = ( '' !== $origin && tconn_is_self_origin( $origin ) );
         }
         $targets[] = array(
             'url'      => $url,
-            'label'    => tcs_author_site_name( $slug, (string) ( $lt['label'] ?? $slug ) ),
+            'label'    => tcsoc_author_site_name( $slug, (string) ( $lt['label'] ?? $slug ) ),
             'icon'     => (string) ( $lt['icon'] ?? 'dashicons-admin-users' ),
             'slug'     => $slug,
             'handle'   => $id,
-            'name'     => tcs_link_name( $term->term_id, $slug, $id ),
+            'name'     => tcsoc_link_name( $term->term_id, $slug, $id ),
             'author'   => true,
             'external' => ! $is_local,
         );
@@ -492,7 +492,7 @@ function tcs_mention_targets( WP_Term $term, array $selected ): array {
  * @param string $fallback Link type label.
  * @return string
  */
-function tcs_author_site_name( string $slug, string $fallback ): string {
+function tcsoc_author_site_name( string $slug, string $fallback ): string {
     if ( 'local_site' === $slug ) {
         $name = (string) get_bloginfo( 'name' );
         return '' !== $name ? $name : $fallback;
@@ -505,24 +505,24 @@ function tcs_author_site_name( string $slug, string $fallback ): string {
  * profile (local or peer), or "handle (Name)" for a social network.
  *
  * @since 1.0.0
- * @param array $t Target row from tcs_mention_targets().
+ * @param array $t Target row from tcsoc_mention_targets().
  * @return string HTML.
  */
-function tcs_mention_label_html( array $t ): string {
+function tcsoc_mention_label_html( array $t ): string {
     if ( ! empty( $t['author'] ) ) {
         $name  = '' !== (string) ( $t['name'] ?? '' ) ? (string) $t['name'] : (string) $t['handle'];
-        $inner = '<span class="tcs-handle">' . esc_html( $name ) . '</span>'
-            . ' @ <span class="tcs-site">' . esc_html( (string) $t['label'] ) . '</span>';
+        $inner = '<span class="tcsoc-handle">' . esc_html( $name ) . '</span>'
+            . ' @ <span class="tcsoc-site">' . esc_html( (string) $t['label'] ) . '</span>';
     } else {
         $name  = ! empty( $t['name'] )
-            ? ' <span class="tcs-name">(' . esc_html( (string) $t['name'] ) . ')</span>'
+            ? ' <span class="tcsoc-name">(' . esc_html( (string) $t['name'] ) . ')</span>'
             : '';
-        $inner = '<span class="tcs-handle">' . esc_html( (string) $t['handle'] ) . '</span>' . $name;
+        $inner = '<span class="tcsoc-handle">' . esc_html( (string) $t['handle'] ) . '</span>' . $name;
     }
 
     // Wrap as one inline label so the flex gap on the link/inline token applies only
     // between the icon and the text — not around the "@" or "(name)" inside it.
-    return '<span class="tcs-label">' . $inner . '</span>';
+    return '<span class="tcsoc-label">' . $inner . '</span>';
 }
 
 /**
@@ -534,7 +534,7 @@ function tcs_mention_label_html( array $t ): string {
  * @param string $value Raw value (will be escaped).
  * @return string
  */
-function tcs_set_attr( string $attrs, string $name, string $value ): string {
+function tcsoc_set_attr( string $attrs, string $name, string $value ): string {
     $escaped     = esc_url( $value );
     // (?<=^|\s): the name must start right after whitespace or the start of the
     // attribute list, not just any word-boundary — so "data-evil-data-tcs-tax" can't
@@ -556,9 +556,9 @@ function tcs_set_attr( string $attrs, string $name, string $value ): string {
  * @param string $value Raw value (will be escaped).
  * @return string
  */
-function tcs_set_text_attr( string $attrs, string $name, string $value ): string {
+function tcsoc_set_text_attr( string $attrs, string $name, string $value ): string {
     $replacement = $name . '="' . esc_attr( $value ) . '"';
-    // (?<=^|\s): see tcs_set_attr() above.
+    // (?<=^|\s): see tcsoc_set_attr() above.
     $pattern     = '/(?<=^|\s)' . preg_quote( $name, '/' ) . '=("|\').*?\1/i';
     if ( preg_match( $pattern, $attrs ) ) {
         return (string) preg_replace( $pattern, $replacement, $attrs, 1 );
@@ -574,8 +574,8 @@ function tcs_set_text_attr( string $attrs, string $name, string $value ): string
  * @param string $class Class to add.
  * @return string
  */
-function tcs_add_class( string $attrs, string $class ): string {
-    // (?<=^|\s): see tcs_set_attr() above.
+function tcsoc_add_class( string $attrs, string $class ): string {
+    // (?<=^|\s): see tcsoc_set_attr() above.
     if ( preg_match( '/(?<=^|\s)class=("|\')(.*?)\1/i', $attrs, $m ) ) {
         $classes = $m[2] . ' ' . $class;
         return (string) preg_replace( '/(?<=^|\s)class=("|\').*?\1/i', 'class="' . esc_attr( $classes ) . '"', $attrs, 1 );
@@ -596,11 +596,11 @@ function tcs_add_class( string $attrs, string $class ): string {
  * @param string $kind    'hashtag' or 'mention'.
  * @return string
  */
-function tcs_render_untargeted_token( string $attrs, string $inner, string $archive, string $kind ): string {
-    if ( 'plain' === tcs_no_link_mode() || '' === $archive ) {
-        return '<span class="tcs-token tcs-' . $kind . ' tcs-token--plain">' . $inner . '</span>';
+function tcsoc_render_untargeted_token( string $attrs, string $inner, string $archive, string $kind ): string {
+    if ( 'plain' === tcsoc_no_link_mode() || '' === $archive ) {
+        return '<span class="tcsoc-token tcsoc-' . $kind . ' tcsoc-token--plain">' . $inner . '</span>';
     }
-    return '<a' . tcs_set_attr( $attrs, 'href', $archive ) . '>' . $inner . '</a>';
+    return '<a' . tcsoc_set_attr( $attrs, 'href', $archive ) . '>' . $inner . '</a>';
 }
 
 /**
@@ -610,9 +610,9 @@ function tcs_render_untargeted_token( string $attrs, string $inner, string $arch
  * @param string $attrs Attribute string.
  * @return string
  */
-function tcs_external_link_attrs( string $attrs ): string {
-    $attrs = tcs_set_text_attr( $attrs, 'rel', 'nofollow external noopener' );
-    return tcs_set_text_attr( $attrs, 'target', '_blank' );
+function tcsoc_external_link_attrs( string $attrs ): string {
+    $attrs = tcsoc_set_text_attr( $attrs, 'rel', 'nofollow external noopener' );
+    return tcsoc_set_text_attr( $attrs, 'target', '_blank' );
 }
 
 /**
@@ -629,26 +629,26 @@ function tcs_external_link_attrs( string $attrs ): string {
  * @param callable $label   Returns a target's label HTML, escaped.
  * @return string
  */
-function tcs_render_multi_target_token( string $attrs, string $inner, array $targets, string $archive, callable $label ): string {
-    $attrs = tcs_set_attr( $attrs, 'href', '' !== $archive ? $archive : $targets[0]['url'] );
-    $attrs = tcs_add_class( $attrs, 'tcs-token--multi' );
-    $attrs = tcs_set_text_attr( $attrs, 'role', 'button' );
-    $attrs = tcs_set_text_attr( $attrs, 'aria-haspopup', 'true' );
-    $attrs = tcs_set_text_attr( $attrs, 'aria-expanded', 'false' );
+function tcsoc_render_multi_target_token( string $attrs, string $inner, array $targets, string $archive, callable $label ): string {
+    $attrs = tcsoc_set_attr( $attrs, 'href', '' !== $archive ? $archive : $targets[0]['url'] );
+    $attrs = tcsoc_add_class( $attrs, 'tcsoc-token--multi' );
+    $attrs = tcsoc_set_text_attr( $attrs, 'role', 'button' );
+    $attrs = tcsoc_set_text_attr( $attrs, 'aria-haspopup', 'true' );
+    $attrs = tcsoc_set_text_attr( $attrs, 'aria-expanded', 'false' );
 
     $links = array();
     foreach ( $targets as $t ) {
         $rel     = $t['external'] ? ' rel="nofollow external noopener" target="_blank"' : '';
         $links[] = sprintf(
-            '<a class="tcs-pane__link tcs-pane__link--%1$s" href="%2$s"%3$s>%4$s %5$s</a>',
+            '<a class="tcsoc-pane__link tcsoc-pane__link--%1$s" href="%2$s"%3$s>%4$s %5$s</a>',
             esc_attr( $t['slug'] ),
             esc_url( $t['url'] ),
             $rel,
-            tcs_network_icon_html( $t['slug'], $t['icon'], tcs_network_color( $t['slug'] ) ),
+            tcsoc_network_icon_html( $t['slug'], $t['icon'], tcsoc_network_color( $t['slug'] ) ),
             $label( $t )
         );
     }
-    $pane = '<span class="tcs-pane" hidden><span class="tcs-pane__inner">' . implode( '', $links ) . '</span></span>';
+    $pane = '<span class="tcsoc-pane" hidden><span class="tcsoc-pane__inner">' . implode( '', $links ) . '</span></span>';
 
-    return '<span class="tcs-token-wrap"><a' . $attrs . '>' . $inner . '</a>' . $pane . '</span>';
+    return '<span class="tcsoc-token-wrap"><a' . $attrs . '>' . $inner . '</a>' . $pane . '</span>';
 }

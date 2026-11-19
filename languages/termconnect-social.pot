@@ -161,8 +161,8 @@ msgstr ""
 msgid "Invalid mention term."
 msgstr ""
 
-#: includes/taxonomies.php:48 assets/js/tcs-editor.js:651
-#: assets/js/tcs-editor.js:868
+#: includes/taxonomies.php:48 assets/js/tcsoc-editor.js:651
+#: assets/js/tcsoc-editor.js:868
 msgid "Hashtag"
 msgstr ""
 
@@ -186,8 +186,8 @@ msgstr ""
 msgid "No hashtags found."
 msgstr ""
 
-#: includes/taxonomies.php:74 assets/js/tcs-editor.js:832
-#: assets/js/tcs-editor.js:873
+#: includes/taxonomies.php:74 assets/js/tcsoc-editor.js:832
+#: assets/js/tcsoc-editor.js:873
 msgid "Mention"
 msgstr ""
 
@@ -225,32 +225,32 @@ msgid ""
 "active."
 msgstr ""
 
-#: assets/js/tcs-editor.js:666
+#: assets/js/tcsoc-editor.js:666
 msgid "Link this hashtag to:"
 msgstr ""
 
-#: assets/js/tcs-editor.js:669
+#: assets/js/tcsoc-editor.js:669
 msgid "No networks enabled."
 msgstr ""
 
-#: assets/js/tcs-editor.js:671 assets/js/tcs-editor.js:856
+#: assets/js/tcsoc-editor.js:671 assets/js/tcsoc-editor.js:856
 msgid "Apply"
 msgstr ""
 
-#: assets/js/tcs-editor.js:847
+#: assets/js/tcsoc-editor.js:847
 msgid "Link this mention to:"
 msgstr ""
 
-#: assets/js/tcs-editor.js:853
+#: assets/js/tcsoc-editor.js:853
 msgid ""
 "No profiles are configured for this mention yet. Add them on the mention’s "
 "edit screen."
 msgstr ""
 
-#: assets/js/tcs-editor.js:927 assets/js/tcs-editor.js:965
+#: assets/js/tcsoc-editor.js:927 assets/js/tcsoc-editor.js:965
 msgid "Create"
 msgstr ""
 
-#: assets/js/tcs-editor.js:967
+#: assets/js/tcsoc-editor.js:967
 msgid "user"
 msgstr ""

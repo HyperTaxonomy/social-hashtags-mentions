@@ -1,4 +1,4 @@
-=== TermConnect Social – Hashtags & Mentions – inline #hashtags and @mentions as taxonomy terms, linked to the social networks you choose ===
+=== TermConnect Social – Hashtags & Mentions ===
 Contributors: eugenevv
 Author: Eugene Weinstein
 Tags: hashtags, mentions, social, taxonomy, fediverse
